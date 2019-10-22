@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectCraneStatisticsDailyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.device.model.ProjectCraneStatisticsDaily">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="builder" property="builder"/>
+        <result column="owner" property="owner"/>
+        <result column="identifier" property="identifier"/>
+        <result column="crane_no" property="craneNo"/>
+        <result column="device_no" property="deviceNo"/>
+        <result column="lift_frequency" property="liftFrequency"/>
+        <result column="percentage0" property="percentage0"/>
+        <result column="percentage40" property="percentage40"/>
+        <result column="percentage60" property="percentage60"/>
+        <result column="percentage80" property="percentage80"/>
+        <result column="percentage90" property="percentage90"/>
+        <result column="percentage110" property="percentage110"/>
+        <result column="percentage120" property="percentage120"/>
+        <result column="weight_warn" property="weightWarn"/>
+        <result column="range_warn" property="rangeWarn"/>
+        <result column="limit_warn" property="limitWarn"/>
+        <result column="moment_warn" property="momentWarn"/>
+        <result column="collision_warn" property="collisionWarn"/>
+        <result column="weight_alarm" property="weightAlarm"/>
+        <result column="range_alarm" property="rangeAlarm"/>
+        <result column="limit_alarm" property="limitAlarm"/>
+        <result column="moment_alarm" property="momentAlarm"/>
+        <result column="collision_alarm" property="collisionAlarm"/>
+        <result column="wind_speed_alarm" property="windSpeedAlarm"/>
+        <result column="tilt_alarm" property="tiltAlarm"/>
+        <result column="work_date" property="workDate"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, project_name AS projectName, builder, owner, identifier, crane_no AS craneNo, device_no AS deviceNo, lift_frequency AS liftFrequency, percentage0, percentage40, percentage60, percentage80, percentage90, percentage110, percentage120, weight_warn AS weightWarn, range_warn AS rangeWarn, limit_warn AS limitWarn, moment_warn AS momentWarn, collision_warn AS collisionWarn, weight_alarm AS weightAlarm, range_alarm AS rangeAlarm, limit_alarm AS limitAlarm, moment_alarm AS momentAlarm, collision_alarm AS collisionAlarm, wind_speed_alarm AS windSpeedAlarm, tilt_alarm AS tiltAlarm, work_date AS workDate
+    </sql>
+
+    <select id="selectPageList"
+            resultType="com.xingyun.equipment.crane.modular.device.vo.ProjectCraneStaticsticsDailyVO">
+
+        SELECT
+        crane.id,
+        crane.project_id AS projectId,
+        ( SELECT NAME FROM t_project_info WHERE t_project_info.id = crane.project_id ) AS projectName,
+        crane.crane_no AS craneNO,
+        crane.device_no AS deviceNo,
+        crane.time_sum as timeSum,
+        crane.is_online as isOnline,
+        sum(lift_frequency) AS liftFrequency,
+        sum(daily.percentage0) as percentage0,
+        sum(daily.percentage40) as percentage40,
+        sum(daily.percentage60) as percentage60,
+        sum(daily.percentage80) as percentage80,
+        sum(daily.percentage90) as percentage90,
+        sum(daily.percentage110) as percentage110,
+        sum(daily.percentage120) as percentage120,
+        sum(daily.weight_warn) AS weightWarn,
+        sum(daily.range_warn) AS rangeWarn,
+        sum(daily.limit_warn) AS limitWarn,
+        sum(daily.moment_warn) AS momentWarn,
+        sum(daily.collision_warn) AS collisionWarn,
+        sum(daily.weight_alarm) AS weightAlarm,
+        sum(daily.range_alarm) AS rangeAlarm,
+        sum(daily.limit_alarm) AS limitAlarm,
+        sum(daily.moment_alarm) AS momentAlarm,
+        sum(daily.collision_alarm) AS collisionAlarm,
+        sum(daily.wind_speed_alarm) AS windSpeedAlarm,
+        sum(daily.tilt_alarm) AS tiltAlarm
+        FROM
+        t_project_crane crane
+        LEFT JOIN
+        t_project_crane_statistics_daily daily on crane.device_no = daily.device_no
+        <if test="startTime != null and endTime!=null">
+            and daily.work_date BETWEEN #{startTime} and #{endTime}
+        </if>
+        where crane.is_del=0
+        <if test="orgIds !=null and orgIds.size > 0">
+            and crane.org_id in
+            <foreach close=")" collection="orgIds" item="listItem" open="(" separator=",">
+                #{listItem}
+            </foreach>
+        </if>
+        <if test="keyWord!=null and keyWord!=''" >
+            and (crane.crane_no like #{keyWord} or crane.device_no like #{keyWord})
+        </if>
+        <if test="projectId != null">
+            and crane.project_id  = #{projectId}
+        </if>
+             <if test="deviceNo !=null and deviceNo!=''">
+                 and crane.device_no = #{deviceNo}
+             </if>
+        GROUP BY deviceNo
+
+
+    </select>
+
+
+
+    <select id="selectPageListNoPage"
+            resultType="com.xingyun.equipment.crane.modular.device.vo.ProjectCraneStaticsticsDailyVO">
+
+        SELECT
+        crane.id,
+        crane.project_id AS projectId,
+        ( SELECT NAME FROM t_project_info WHERE t_project_info.id = crane.project_id ) AS projectName,
+        crane.crane_no AS craneNO,
+        crane.device_no AS deviceNo,
+        crane.time_sum as timeSum,
+        crane.is_online as isOnline,
+        sum(daily.lift_frequency) AS liftFrequency,
+        sum(daily.weight_alarm) AS weightAlarm
+        FROM
+        t_project_crane crane
+        LEFT JOIN
+        t_project_crane_statistics_daily daily on crane.device_no = daily.device_no
+        <if test="startTime != null and endTime!=null">
+            and daily.work_date BETWEEN #{startTime} and #{endTime}
+        </if>
+        where crane.is_del=0
+        <if test="projectId != null">
+            and crane.project_id  = #{projectId}
+        </if>
+        <if test="orgIds !=null and orgIds.size > 0">
+            and crane.org_id in
+            <foreach close=")" collection="orgIds" item="listItem" open="(" separator=",">
+                #{listItem}
+            </foreach>
+        </if>
+        <if test="deviceNo !=null and deviceNo!=''">
+            and crane.device_no = #{deviceNo}
+        </if>
+        GROUP BY deviceNo
+
+
+    </select>
+
+
+
+
+</mapper>

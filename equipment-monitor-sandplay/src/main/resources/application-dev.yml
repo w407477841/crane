@@ -1,0 +1,94 @@
+##########################################################
+##################  dev的配置  #################
+##########################################################
+
+###################  项目启动端口  ###################
+server:
+  port: 8091
+
+xywg:
+  netty:
+    open: false
+    ports:  #沙盘串口 ， 不设置不开启
+    weight-ports:   #称重串口  ，不设置不开启
+    all-ports:  9095 #二合一   不设置不开启
+
+##################  指令配置  ########################
+cmd:
+  #weight-timer 开启称重定时发送指令
+  weight-timer:  true
+  weight-serial-port: COM4  #称重串口
+  head: 55   ###报文头
+  #timer 开启自动扫称重串口
+  timer: false
+  all-open: 550113FFFFFFFF65
+  all-close: 5501130000000069
+  lift:  ###升降机
+    addr: 01,01,01
+    control: 21,21,21
+    data: 0002FF01,0002FF02,0002FF03
+    crc: 79,7A,7B
+  crane: ###塔基
+    addr: 01
+    control: 21
+    data: 0002FF04
+    crc: 7C
+  gate: #####闸机
+    addr: 01
+    control: 01
+    data: 00000000
+    crc: 7D
+  lamp: ####太阳能路灯
+    addr: 01
+    control: 21
+    data: 0002FF05
+    crc: 7D
+  weight: ####电子称重
+    addr: 01
+    control: 21
+    data: 0002FF06
+    crc: 7E
+  spray: ####喷水
+    addr: 01
+    control: 21
+    data: 0002FF07
+    crc: 7F
+
+###################  日志   ##########################
+logging:
+  level.root: info
+  level.com.stylefeng: debug
+  path: logs/
+  file: xywg.log
+
+################## 数据源 #############################
+spring:
+  datasource:
+    url: jdbc:mysql://118.31.69.25:3306/smartsite?autoReconnect=true&useUnicode=true&characterEncoding=utf-8&useServerPrepStmts=false&rewriteBatchedStatements=true&allowMultiQueries=true
+    username: root
+    password: Xingyun*_001
+    db-name: smartsite
+    filters: log4j,mergeStat
+
+
+###################  mybatis-plus配置  ###################
+mybatis-plus:
+  mapper-locations: classpath*:com/xywg/equipment/**/mapping/*.xml
+  typeAliasesPackage: com.xywg.equipment.sandplay.modular.sandplay.model
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+    #metaObjectHandler: com.xywg.equipmentmonitor.core.aop.MyMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: false
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+
+

@@ -1,0 +1,72 @@
+##########################################################
+##################  所有dev的配置  #################
+##########################################################
+
+################### xywg ###############
+xywg:
+  redisHead: device_platform
+
+
+################ zbus 消息队列 地址 ##########################
+zbus:
+  host: 192.168.1.64:15555
+  db-data-topic: topic-db-data #数据
+  db-lx-topic: topic-db-lx #离线
+  db-sx-topic: topic-db-sx #上线
+  websocket-topic: topic-websocket
+
+
+##############################阿里配置#############################
+ali:
+  accessKeyId: LTAIM7w6KjwRXGxP
+  accessKeySecret: 2Ixpjf7Dl3EGjvbqe3AziYIoFjL5mL
+  iosAppKey: 25052872
+  androidAppKey: 25054797
+  env: DEV #DEV,PRODUCT
+
+###################  spring配置  ###################
+
+###################  redis配置  ###################
+spring:
+  redis:
+    host: 121.43.151.100
+    port: 6379
+    password: duanjudy@123
+    timeout: 3000
+    max-idle: 500
+    min-idle: 50
+    active: 2000
+    wait: 1000
+    cahce-names: xywg-sbgl-day-2,xywg-sbgl-min-30,xywg-sbgl-min-2,xywg-sbgl-hour-2
+##############数据库######################
+  datasource:
+    url: jdbc:mysql://118.31.69.25:3306/device_platform?autoReconnect=true&useUnicode=true&characterEncoding=utf-8&useServerPrepStmts=false&rewriteBatchedStatements=true&allowMultiQueries=true
+    username: root
+    password: Xingyun*_001
+    db-name: device_platform
+    filters: log4j,mergeStat
+###################  mybatis-plus配置  ###################
+mybatis-plus:
+  mapper-locations: classpath*:**/dao/mapping/*.xml
+  typeAliasesPackage: com.xywg.equipment.monitor.modular.*.model
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+  #  metaObjectHandler: com.xywg.equipmentmonitor.core.aop.MyMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: false
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+
+
+
+
+
+

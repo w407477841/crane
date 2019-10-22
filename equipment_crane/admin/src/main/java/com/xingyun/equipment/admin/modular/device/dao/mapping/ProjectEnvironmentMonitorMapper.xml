@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectEnvironmentMonitorMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectEnvironmentMonitor">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="device_no" property="deviceNo"/>
+        <result column="name" property="name"/>
+        <result column="identifier" property="identifier"/>
+        <result column="specification" property="specification"/>
+        <result column="owner" property="owner"/>
+        <result column="gprs" property="gprs"/>
+
+        <result column="manufactor" property="manufactor"/>
+        <result column="pm10" property="pm10"/>
+        <result column="pm25" property="pm25"/>
+        <result column="noise" property="noise"/>
+        <result column="wind_speed" property="windSpeed"/>
+        <result column="wind_direction" property="windDirection"/>
+
+        <result column="tsp" property="tsp"/>
+        <result column="wind_force" property="windForce"/>
+        <result column="atmospheric" property="atmospheric"/>
+        <result column="is_online" property="isOnline"/>
+        <result column="status" property="status"/>
+        <result column="place_point" property="placePoint"/>
+        <result column="comments" property="comments"/>
+        <result column="is_del" property="isDel"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="modify_user" property="modifyUser"/>
+        <result column="org_id" property="orgId"/>
+        <result column="createUserName" property="createUserName"/>
+         <result column="temperature_min" property="temperatureMin"/>
+        <result column="humidity_min" property="humidityMin"/>
+         <result column="temperature_max" property="temperatureMax"/>
+        <result column="humidity_max" property="humidityMax"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId,gprs, device_no AS deviceNo, identifier, specification, owner, manufactor, pm10, pm25, noise, wind_speed AS windSpeed, wind_direction AS windDirection, 
+        temperature_min,
+        humidity_min,
+        temperature_max,
+        humidity_max, tsp, wind_force AS windForce, atmospheric, is_online AS isOnline, status, place_point AS placePoint, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.project_id,
+        ${alias}.device_no,
+        ${alias}.name,
+        ${alias}.gprs,
+        ${alias}.identifier, 
+        ${alias}.specification, 
+        ${alias}.owner,
+        ${alias}.manufactor,
+        ${alias}.pm10,
+        ${alias}.pm25,
+        ${alias}.noise,
+        ${alias}.wind_speed,
+        ${alias}.wind_direction,
+        ${alias}.temperature_min,
+		${alias}.humidity_min,
+		${alias}.temperature_max,
+		${alias}.humidity_max,
+        ${alias}.tsp,
+        ${alias}.wind_force,
+        ${alias}.atmospheric,
+        ${alias}.is_online,
+        ${alias}.status,
+        ${alias}.place_point,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+    </sql>
+
+    <resultMap id="otherResultMap" type="com.xingyun.equipment.admin.modular.device.vo.ProjectEnvironmentMonitorVO"
+               extends="BaseResultMap">
+        <result column="project_name" property="projectName"/>
+    </resultMap>
+
+
+    <select id="selectPageList" resultMap="otherResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+         if(a.is_online =1,'在线','离线') as statusName,
+        b.name as project_name,
+        c.name as createUserName
+        from t_project_environment_monitor a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_sys_user c on c.id = a.create_user
+      
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="selectListMap" resultMap="otherResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+         if(a.is_online =1,'在线','离线') as statusName,
+        b.name,
+        c.name as createUserName
+        from t_project_environment_monitor a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_sys_user c on c.id = a.create_user
+        
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="countDevice" resultType="long">
+    select count(*) from t_project_environment_monitor where is_del =0
+    and device_no = #{deviceNo}
+    and project_id =#{projectId}
+    </select>
+
+    <select id="getEnvironmentInfo" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.vo.MonitorAlarmVO">
+    SELECT
+        pc.id,
+        pcd.device_no as deviceNo,
+        pcd.pm25,
+        pcd.pm10,
+        pcd.temperature,
+        pcd.humidity,
+        pcd.wind_speed as windSpeed,
+        pcd.wind_direction as windDirection,
+        pcd.noise,
+        pcd.tsp,
+        pcd.wind_force as windForce,
+       if(pc.is_online=1,'在线','离线') as status,
+        pcd.device_time as  deviceTime
+        FROM ${tableName} pcd
+        
+        LEFT JOIN
+        t_project_environment_monitor pc
+        ON pcd.monitor_id = pc.id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        WHERE pc.is_del = 0 AND pi.uuid = #{uuid} AND pcd.device_no = #{deviceNo}
+        order by pcd.device_time desc
+    </select>
+    <select id="getAlarmInfo" parameterType="java.util.Map"
+            resultType="com.xingyun.equipment.admin.modular.device.vo.MonitorAlarmVO">
+        SELECT
+        pca.alarm_id AS alarmId,pi.name AS projectName,pi.uuid,pc.device_no AS deviceNo,pca.alarm_info AS
+        info,COUNT(pca.id) AS amount
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_environment_monitor pc
+        ON pc.id = pca.monitor_id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        WHERE pca.is_del = 0 and pc.is_del =0 AND pi.uuid IN
+        <foreach collection="uuids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="deviceNo != null and deviceNo != ''">
+            AND pc.device_no = #{deviceNo}
+        </if>
+        <if test="alarmId != null and alarmId != ''">
+            AND pca.alarm_id = #{alarmId}
+        </if>
+        GROUP BY pc.device_no,pca.alarm_info
+
+    </select>
+
+    <select id="getAlarmDetail" parameterType="java.util.Map"
+            resultType="com.xingyun.equipment.admin.modular.device.vo.MonitorAlarmVO">
+       SELECT
+        pca.id,pca.create_time AS deviceTime,pca.alarm_info AS info,
+        if(pca.status =1 ,'已处理','未处理') status,
+
+        pca.modify_user_name as userName,pca.modify_time as modifyTime
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_environment_monitor pc
+        ON pc.id = pca.monitor_id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        left join t_sys_user u
+        on u.id = pca.modify_user
+        WHERE pca.is_del = 0 and pc.is_del =0
+        AND pca.alarm_id = #{alarmId}
+        <if test="deviceNo != null and deviceNo != ''">
+            AND pc.device_no = #{deviceNo}
+        </if>
+        order by pca.create_time desc
+    </select>
+    <update id="plusCallTimes" >
+     update t_project_target_set_environment
+     set call_times=ifnull(call_times,0) +1
+     where specification =#{specification}
+     and manufactor =#{manufactor}
+    </update>
+    <update id="minusCallTimes" >
+     update t_project_target_set_environment
+     set call_times=ifnull(call_times,0) -1
+     where specification =#{specification}
+     and manufactor =#{manufactor}
+    </update>
+
+    <select id="selectByOrgId" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.ProjectEnvironmentMonitor">
+        SELECT
+        project_id AS projectId,device_no AS deviceNo
+        FROM
+        t_project_environment_monitor
+        WHERE is_del = 0 AND org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+         AND status = 1
+        ORDER BY create_time DESC 
+    </select>
+
+    <select id="checkByDeviceNo" resultMap="BaseResultMap">
+        SELECT
+        id,
+        device_no
+        from t_project_environment_monitor
+        where is_del=0
+        and id!=#{id}
+        and device_no=#{deviceNo}
+        and status=1
+    </select>
+</mapper>

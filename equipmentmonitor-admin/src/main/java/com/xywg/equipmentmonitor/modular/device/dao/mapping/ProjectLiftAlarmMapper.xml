@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectLiftAlarmMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectLiftAlarm">
+        <id column="id" property="id" />
+        <result column="lift_id" property="liftId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="alarm_id" property="alarmId" />
+        <result column="alarm_info" property="alarmInfo" />
+    	<result column="is_del" property="isDel" />
+    	<result column="create_time" property="createTime" />
+    	<result column="create_user" property="createUser" />
+    	<result column="modify_time" property="modifyTime" />
+    	<result column="modify_user" property="modifyUser" />
+    </resultMap>
+     <resultMap id ="newResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectLiftAlarmVO" extends="BaseResultMap">
+	 	<result column="countStatus" property="countStatus" />
+	 	<result column="createUserName" property="createUserName" />
+	 	<result column="orgName" property="orgName" />
+	</resultMap>
+	<resultMap id ="liftResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectLiftVO" >
+	 	 <id column="id" property="id" />
+        <result column="projectId" property="projectId" />
+        <result column="projectName" property="projectName" />
+        <result column="is_online" property="isOnline" />
+        <result column="device_no" property="deviceNo" />
+	</resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        lift_id,
+        alarm_id,
+        device_no,
+        alarm_info,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.lift_id AS ${alias}_lift_id,
+        ${alias}.device_no AS ${alias}_device_no,
+        ${alias}.alarm_id AS ${alias}_alarm_id,
+        ${alias}.alarm_info AS ${alias}_alarm_info,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.lift_id,
+        ${alias}.device_no,
+        ${alias}.alarm_id,
+        ${alias}.alarm_info,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+    </sql>
+     <!--查询警告数量  -->
+    <select id="countEarlyWarning" parameterType="java.util.Map" resultMap="newResultMap">
+    select COUNT(1) as countStatus,alarm_info,alarm_id,lift_id from ${tableName} 
+     where is_del =0 
+     and lift_id = ${id} 
+     <if test="deviceTimeBegin !=null and deviceTimeEnd !=null">
+      and create_time between ${deviceTimeBegin} and ${deviceTimeEnd}
+     
+     </if>
+    
+    
+    GROUP BY alarm_id 
+    </select>
+     <!--查询警告详情  -->
+    <select id="earlyWarningDetail"  resultMap="newResultMap">
+    select alarm_info,create_time from ${tableName} 
+     where is_del =0 
+     and lift_id = ${id} 
+     <if test="deviceTimeBegin !=null and deviceTimeEnd !=null">
+      and create_time between ${deviceTimeBegin} and ${deviceTimeEnd}
+     
+     </if>
+     <if test="alarmType == 1 ">
+     and alarm_id in (2)
+     </if>
+     <if test="alarmType == 2 ">
+      and alarm_id in (1,3,4,5)
+     </if>
+     <if test="alarmType == 3 ">
+      and alarm_id in (1)
+     </if>
+     order by create_time desc
+    </select>
+    <!-- 实时监控升降机 -->
+     <select id="realTimeMonitoring"  resultMap="liftResultMap">
+        select
+        a.id,
+        a.device_no,
+        a.manufactor,
+        IFNULL((SELECT
+		  IF (
+			  (
+				UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(tt.end_time)
+			) > 45,
+			0,
+			1
+
+		)
+		
+		FROM
+			t_project_lift_heartbeat tt
+		where tt.lift_id =a.id
+		ORDER BY
+			id DESC
+        LIMIT 1),
+        0
+
+        ) as is_online,
+        b.name as projectName
+        from t_project_lift a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+     <insert id="insertMessage" parameterType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        INSERT INTO
+        t_project_message_lift
+        (model,
+        title,
+        send_time,
+        content,
+        related_user,
+        is_del
+        )
+        VALUES(
+        #{model},
+        #{title},
+        date_format(now(),'%Y-%m-%d %H:%i:%s'),
+        #{content},
+        #{relatedUser},
+        0
+        )
+    </insert>
+    
+  
+    
+     
+   
+</mapper>

@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=${project.basedir}/libs/fastdfs-client-java-1.1.0-RELESE.jar -DgroupId=org.csource -DartifactId=fastdfs-client-java -Dversion=1.1.0 -Dpackaging=jar

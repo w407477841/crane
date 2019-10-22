@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectSprayDetailMapper">
+    
+    <select id="getBySprayId" resultType="com.xingyun.equipment.crane.modular.device.model.ProjectSprayDetail">
+        select
+        device_no as  deviceNo,
+        operation_type as operationType,
+        control_mode as controlMode,
+        detail as detail
+        from t_project_spray_detail
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+</mapper>

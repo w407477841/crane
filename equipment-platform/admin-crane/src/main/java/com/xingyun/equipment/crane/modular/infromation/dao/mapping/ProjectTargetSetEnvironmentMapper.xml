@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.infromation.dao.ProjectTargetSetEnvironmentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.infromation.model.ProjectTargetSetEnvironment">
+        <id column="id" property="id" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="pm10" property="pm10" />
+        <result column="pm25" property="pm25" />
+        <result column="noise" property="noise" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="tsp" property="tsp" />
+        <result column="temperature_max" property="temperatureMax" />
+        <result column="temperature_min" property="temperatureMin" />
+        <result column="humidity_max" property="humidityMax" />
+        <result column="humidity_min" property="humidityMin" />
+        <result column="comments" property="comments" />
+        <result column="org_id" property="orgId" />
+    	<result column="is_del" property="isDel" />
+    	<result column="create_time" property="createTime" />
+    	<result column="create_user" property="createUser" />
+    	<result column="modify_time" property="modifyTime" />
+    	<result column="modify_user" property="modifyUser" />
+        <result column="wind_force" property="windForce" />
+        <result column="atmospheric" property="atmospheric" />
+        <result column="call_times" property="callTimes" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        specification,
+        manufactor,
+        pm10,
+        pm25,
+        noise,
+        wind_speed,
+        tsp,
+        temperature_max,
+        temperature_min,
+        humidity_max,
+        humidity_min,
+        comments,
+        org_id,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+        wind_force,
+        atmospheric,
+        call_times
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.specification AS ${alias}_specification,
+        ${alias}.manufactor AS ${alias}_manufactor,
+        ${alias}.pm10 AS ${alias}_pm10,
+        ${alias}.pm25 AS ${alias}_pm25,
+        ${alias}.noise AS ${alias}_noise,
+        ${alias}.wind_speed AS ${alias}_wind_speed,
+        ${alias}.tsp AS ${alias}_tsp,
+        ${alias}.temperature_max AS ${alias}_temperature_max,
+        ${alias}.temperature_min AS ${alias}_temperature_min,
+        ${alias}.humidity_max AS ${alias}_humidity_max,
+        ${alias}.humidity_min AS ${alias}_humidity_min,
+        ${alias}.comments AS ${alias}_comments,
+        ${alias}.org_id AS ${alias}_org_id,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+        ${alias}.wind_force AS ${alias}_wind_force,
+        ${alias}.atmospheric AS ${alias}_atmospheric,
+        ${alias}.call_times AS ${alias}_call_times,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.specification,
+        ${alias}.manufactor,
+        ${alias}.pm10,
+        ${alias}.pm25,
+        ${alias}.noise,
+        ${alias}.wind_speed,
+        ${alias}.tsp,
+        ${alias}.temperature_max,
+        ${alias}.temperature_min,
+        ${alias}.humidity_max,
+        ${alias}.humidity_min,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+        ${alias}.wind_force,
+        ${alias}.atmospheric,
+        ${alias}.call_times
+    </sql>
+
+    <!--条件分页查询-->
+    <select id="selectPageList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Column_List">
+            <property name="alias" value="a" />
+        </include>
+        from t_project_target_set_environment a
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.id desc
+    </select>
+
+    <!--根据制造厂商和规格型号判重-->
+    <select id="checkBySpecificationAndManufactor" resultType="int" >
+        SELECT
+        count(*)
+        from t_project_target_set_environment
+        where specification=#{e.body.specification}
+        and manufactor=#{e.body.manufactor}
+        <if test="e.body.id!=null and e.body.id!=''">
+            and id!=#{e.body.id}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectHelmetAlarmMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectHelmetAlarm">
+        <id column="id" property="id" />
+        <result column="helmet_id" property="helmetId" />
+        <result column="alarm_type" property="alarmType" />
+        <result column="alarm_info" property="alarmInfo" />
+        <result column="detail_id" property="detailId" />
+        <result column="handle_status" property="handleStatus" />
+        <result column="handle_name" property="handleName" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, helmet_id AS helmetId, alarm_type AS alarmType, alarm_info AS alarmInfo, detail_id AS detailId, handle_status AS handleStatus, handle_name AS handleName, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+    
+    <select id="getAlarmMessage" resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectHelmetAlarm">
+        select
+        id,
+        alarm_type as alarmType,
+        alarm_info as alarmInfo,
+        create_time as createTime
+        from t_project_helmet_alarm_${month}
+        where helmet_id=#{helmetId} and is_del=0
+        <if test="beginDate!=null and beginDate!=''">
+            and create_time &gt; #{beginDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            and create_time &lt; #{endDate}
+        </if>
+        order by create_time desc
+    </select>
+
+
+</mapper>

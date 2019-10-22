@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.system.dao.RoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.system.model.Role">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="code" property="code" />
+        <result column="instroction" property="instroction" />
+        <result column="org_id" property="orgId" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id AS userId, code, instroction, org_id AS orgId, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <select id="selectRoleInfo" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.system.model.Role">
+        SELECT
+        id,name,code,instroction,org_id AS orgId,status,comments,create_time AS createTime,create_user AS createUser
+        FROM
+        t_sys_role
+        WHERE is_del = 0 AND org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="key != null and key != ''">
+            AND (name LIKE concat('%',#{key},'%') OR  code LIKE concat('%',#{key},'%'))
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectRoleNameByUserId" parameterType="java.util.Map" resultType="java.lang.String">
+        SELECT
+        r.name
+        FROM
+        t_sys_role r
+        LEFT JOIN
+        t_sys_user_role ur
+        ON ur.role_id = r.id
+        WHERE r.is_del = 0 AND r.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        AND ur.user_id = #{id} AND ur.is_del = 0
+    </select>
+</mapper>

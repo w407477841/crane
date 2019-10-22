@@ -1,0 +1,47 @@
+/target/
+/equipmentmonitor-admin/logs/
+/equipmentmonitor-generator/target/
+/equipment-monitor-iot/target/
+/equipmentmonitor-core/target/
+/equipmentmonitor-device-base/target/
+/equipmentmonitor-device-crane/target/
+/equipmentmonitor-device-envmon/target/
+/equipmentmonitor-device-lift/target/
+/equipmentmonitor-back/target/
+/equipmentmonitor-base/target/
+/equipment_crane/*/target/
+**/target/
+!.mvn/wrapper/maven-wrapper.jar
+/logs/
+/equipment-monitor-iot/xywg.log
+xywg.log
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.log
+.gz
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+upgrade/smartSite_gov/null/2018/10/12/1539310999840.bin
+xywg.log.1
+upgrade/smartSite_gov/null/2018/11/06/1541488581029.bin
+xywg.log.2
+xywg.log.*.gz
+xywg.log*
+zhongkong/*/target/*

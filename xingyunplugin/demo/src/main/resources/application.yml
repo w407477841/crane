@@ -1,0 +1,9 @@
+
+xingyun:
+  enviroment:
+    heart: 180
+    port: 9966
+    debug: false
+spring:
+  profiles:
+    active: dev

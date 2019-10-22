@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectCraneFileMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectCraneFile">
+            <id column="id" property="id" />
+                                                                                            <result column="info_id" property="infoId" />
+                    <result column="code" property="code" />
+                    <result column="name" property="name" />
+                    <result column="type" property="type" />
+                    <result column="size" property="size" />
+                    <result column="author" property="author" />
+                    <result column="path" property="path" />
+                    <result column="comments" property="comments" />
+                    <result column="is_del" property="isDel" />
+                    <result column="create_time" property="createTime" />
+                    <result column="create_user" property="createUser" />
+                    <result column="modify_time" property="modifyTime" />
+                    <result column="modify_user" property="modifyUser" />
+                    <result column="org_id" property="orgId" />
+        </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="craneFileResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectCraneFile">
+        <id column="id" property="id" />
+        <result column="info_id" property="infoId" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="size" property="size" />
+        <result column="author" property="author" />
+        <result column="path" property="path" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="crane_id" property="craneId" />
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+    id, info_id AS infoId, code, name, type, size, author, path, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+
+</mapper>

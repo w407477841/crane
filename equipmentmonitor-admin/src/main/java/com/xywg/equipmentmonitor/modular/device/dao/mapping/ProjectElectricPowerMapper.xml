@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectElectricPowerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectElectricPower">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="device_no" property="deviceNo" />
+        <result column="collecter_no" property="collecterNo" />
+        <result column="type" property="type" />
+        <result column="project_id" property="projectId" />
+        <result column="gprs" property="gprs" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="dissipation" property="dissipation" />
+        <result column="is_online" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="place_point" property="placePoint" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="ratio" property="ratio" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, 
+        name, 
+        device_no AS deviceNo, 
+        collecter_no AS collecterNo, 
+        type, 
+        project_id AS projectId, 
+        gprs, 
+        specification, 
+        manufactor, 
+        dissipation, 
+        is_online AS isOnline, 
+        status, 
+        place_point AS placePoint, 
+        comments, 
+        is_del AS isDel, 
+        create_time AS createTime, 
+        create_user AS createUser, 
+        modify_time AS modifyTime, 
+        modify_user AS modifyUser, 
+        org_id AS orgId,
+        ratio
+    </sql>
+    
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.name,
+        ${alias}.device_no,
+        ${alias}.collecter_no,
+        ${alias}.type,
+        ${alias}.project_id,
+        ${alias}.gprs, 
+        ${alias}.specification, 
+        ${alias}.manufactor,
+        ${alias}.dissipation,
+        ${alias}.is_online,
+        ${alias}.status,
+        ${alias}.place_point,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+        ${alias}.ratio,
+    </sql>
+    
+    <resultMap id="otherResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectElectricPowerVO"
+               extends="BaseResultMap">
+        <result column="project_name" property="projectName"/>
+    </resultMap>
+    
+    <select id="selectPageList" resultMap="otherResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+         CASE a.is_online WHEN 1 THEN '在线' ELSE '离线' END as statusName,
+        b.name as project_name,
+        c.name as createUserName
+        from t_project_electric_power a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_sys_user c on c.id = a.create_user
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="selectListMap" resultMap="otherResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+        CASE a.is_online WHEN 1 THEN '在线' ELSE '离线' END as statusName,
+        b.name as project_name,
+        c.name as createUserName
+        from t_project_electric_power a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_sys_user c on c.id = a.create_user
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="countDevice" resultType="long">
+    select count(*) from t_project_electric_power where is_del =0
+    and device_no = #{deviceNo}
+    and project_id =#{projectId}
+    </select>
+
+    
+    
+    
+    <update id="plusCallTimes" >
+     update t_project_target_set_electric
+     set call_times=ifnull(call_times,0) +1
+     where specification =#{specification}
+     and manufactor =#{manufactor}
+    </update>
+    <update id="minusCallTimes" >
+     update t_project_target_set_electric
+     set call_times=ifnull(call_times,0) -1
+     where specification =#{specification}
+     and manufactor =#{manufactor}
+    </update>
+
+    <select id="selectByOrgId" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectElectricPower">
+        SELECT
+        project_id AS projectId,device_no AS deviceNo
+        FROM
+        t_project_electric_power
+        WHERE is_del = 0 AND org_id = #{orgId}
+    </select>
+        <select id="getAmountByDevice" resultType="java.math.BigDecimal">
+       select IFNULL(SUM(amount_used),0)  from t_project_ammeter_daily where statistics_date  BETWEEN ${beginDay} and ${endDay}
+       and device_id  = #{id}
+    </select>
+    <select id="getAmountByMonth" resultType="java.math.BigDecimal">
+       select IFNULL(SUM(amount_used),0)  from t_project_ammeter_daily where statistics_date like #{statisticsDate}
+      <if test="ids.size >0">
+       and device_id  in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    </if>
+    </select>
+    
+     <select id="getAmountByDays" resultType="java.math.BigDecimal">
+       select IFNULL(SUM(amount_used),0)  from t_project_ammeter_daily where statistics_date  
+       BETWEEN ${beginDay} and ${endDay}
+        <if test="ids.size >0">
+       and device_id  in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    </if>
+    </select>
+    <select id="selectAbnormal" resultType="java.lang.Integer">
+    select COUNT(DISTINCT electric_id)
+    from 
+	t_project_electric_power_alarm_${month} b 
+    LEFT JOIN  t_project_electric_power a
+    on  a.id = b.electric_id
+    where a.id in
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    </select>
+	
+    
+     <select id="getElecDetailInfo" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectElectricPowerVO">
+  <!-- select tmp.currentDegree,tmp.deviceTime,
+   currentDegree-ifnull((select t1.currentDegree 
+   			from (
+  ( select max(pcd.current_degree) as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_electric_power pc left join  ${tableName}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc )
+union all
+(select pcd.current_degree as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_electric_power pc left join  ${tableName1}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+  and DATE_FORMAT(pcd.device_time,'%Y-%m-%d') >= #{lastMonthDay}
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc limit 1) order by deviceTime desc
+
+) t1 where t1.electricId = tmp.electricId and  t1.deviceTime &lt; tmp.deviceTime limit 1),0) as electricQuantity
+   from(
+  ( select max(pcd.current_degree) as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_electric_power pc left join  ${tableName}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc )
+union all
+(select pcd.current_degree as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_electric_power pc left join  ${tableName1}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+  and DATE_FORMAT(pcd.device_time,'%Y-%m-%d') >= #{lastMonthDay}
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc limit 1) order by deviceTime desc
+
+) tmp where tmp.deviceTime >= #{fristDay}
+   -->
+   
+    select pc.degree as currentDegree,pc.statistics_date as deviceTime,
+    pc.amount_used as electricQuantity 
+    from  t_project_electric_power pcd
+    left join t_project_ammeter_daily pc
+    on pcd.id = pc.device_id and pc.statistics_date >=#{fristDay}
+    inner join t_project_info pi
+    ON pi.id = pcd.project_id and pi.uuid =#{uuid} and pcd.device_no = #{deviceNo}
+   
+    order by pc.statistics_date desc
+    </select>
+    
+    
+     <select id="getAlarmInfo" parameterType="java.util.Map"
+            resultType="com.xywg.equipmentmonitor.modular.device.vo.ElectricAlarmVO">
+        SELECT
+        pca.alarm_id AS alarmId,pi.name AS projectName,pi.uuid,pc.device_no AS deviceNo,pca.alarm_info AS
+        info,COUNT(pca.id) AS amount
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_electric_power pc
+        ON pc.id = pca.electric_id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        WHERE pca.is_del = 0 and pc.is_del =0 AND pi.uuid IN
+        <foreach collection="uuids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="deviceNo != null and deviceNo != ''">
+            AND pc.device_no = #{deviceNo}
+        </if>
+        <if test="alarmId != null and alarmId != ''">
+            AND pca.alarm_id = #{alarmId}
+        </if>
+        GROUP BY pc.device_no,pca.alarm_info
+
+    </select>
+
+    <select id="getAlarmDetail" parameterType="java.util.Map"
+            resultType="com.xywg.equipmentmonitor.modular.device.vo.ElectricAlarmVO">
+       SELECT
+        pca.id,pca.create_time AS deviceTime,pca.alarm_info AS info,
+        if(pca.status =1 ,'已处理','未处理') status,
+
+        pca.modify_user_name as userName,pca.modify_time as modifyTime
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_electric_power pc
+        ON pc.id = pca.electric_id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        left join t_sys_user u
+        on u.id = pca.modify_user
+        WHERE pca.is_del = 0 and pc.is_del =0
+        AND pca.alarm_id = #{alarmId}
+        <if test="deviceNo != null and deviceNo != ''">
+            AND pc.device_no = #{deviceNo}
+        </if>
+        order by pca.create_time desc
+    </select>
+
+    <select id="checkByDeviceNo" resultMap="BaseResultMap">
+        select
+        id,
+        device_no
+        from t_project_electric_power
+        where id!=#{id}
+        and device_no=#{deviceNo}
+        and status=1
+        and is_del=0
+    </select>
+</mapper>

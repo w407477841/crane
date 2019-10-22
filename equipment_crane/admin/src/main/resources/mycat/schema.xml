@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+<mycat:schema xmlns:mycat="http://io.mycat/">
+
+	<schema name="equipment_crane" checkSQLschema="false" >
+		<!-- 全局表 -->
+		<table name="t_sys_operation" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_sys_organization" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_sys_user" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_sys_role" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_sys_organization_user" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_sys_role_operation" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_sys_user_role" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_announcement" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_announcement_file" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_application_config" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_area" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_calibration_log" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_data_model" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_file" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_heartbeat" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_message" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_original_data" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_single_collision_avoidance_set" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+        <table name="t_project_crane_muti_collision_avoidance_set" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+        <table name="t_project_crane_upgrade_record" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_crane_video" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_dev_error" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_device" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_device_error_log" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_device_restart_record" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_device_stock" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_device_upgrade_package" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_device_worker_record" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_error_data" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_info" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_master_cetificate_type" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_master_device_type" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_master_protocol_config" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_message" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_message_device_error" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_message_model" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_message_user_device_error_log" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_target_set_crane" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_user" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+        <table name="t_project_crane_statistics_daily" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+		<table name="t_project_top_up" primaryKey="ID" type="global"  dataNode="datanodeGlobal"></table>
+
+		<!-- 分表 -->
+		<table name="t_project_crane_detail" autoIncrement="true" primaryKey="ID"  dataNode="dn1,dn2,dn3,dn4,dn5" rule="sharding-by-date" ruleRequired="true" ></table>
+		<table name="t_project_crane_alarm" autoIncrement="true" primaryKey="ID"   dataNode="dn1,dn2,dn3,dn4,dn5" rule="sharding-by-date" ruleRequired="true"></table>
+		<table name="t_project_crane_cyclic_work_duration" autoIncrement="true" primaryKey="ID"   dataNode="dn1,dn2,dn3,dn4,dn5" rule="sharding-by-date" ruleRequired="true"></table>
+	</schema>
+	<!--数据节点dn1，对应的主机c1,对应是数据库db1 -->
+	<dataNode name="datanodeGlobal" dataHost="ProdHost" database="equipment_crane" />
+	<dataNode name="dn1" dataHost="ProdHost" database="dn1" />
+	<dataNode name="db2" dataHost="ProdHost" database="dn2" />
+	<dataNode name="dn3" dataHost="ProdHost" database="dn3" />
+	<dataNode name="dn4" dataHost="ProdHost" database="dn4" />
+	<dataNode name="dn5" dataHost="ProdHost" database="dn5" />
+	<!-- 正式主机主机-->
+	<dataHost name="ProdHost" maxCon="1000" minCon="10" balance="0"
+			  writeType="0" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<!--mysql数据库的连接串 -->
+		<writeHost host="hostM1" url="192.168.1.106:3306" user="root"
+				   password="Xingyun*_001">
+			<!-- can have multi read hosts -->
+			<readHost host="hostS1" url="192.168.1.106:3306" user="root" password="Xingyun*_001">
+
+			</readHost>
+		</writeHost>
+
+	</dataHost>
+
+
+
+</mycat:schema>

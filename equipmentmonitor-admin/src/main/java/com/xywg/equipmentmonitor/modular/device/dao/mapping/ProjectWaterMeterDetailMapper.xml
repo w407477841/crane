@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectWaterMeterDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectWaterMeterDetail">
+        <id column="id" property="id" />
+        <result column="electric_id" property="electricId" />
+        <result column="current_degree" property="currentDegree" />
+        <result column="device_time" property="deviceTime" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, electric_id AS electricId, current_degree AS currentDegree, device_time AS deviceTime, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+	<select id="eveSum" resultType="java.util.Map">
+		select DATE_FORMAT(
+		statistics_date,
+		'%Y-%m-%d'
+		)  as `xAxis` , sum(amount_used) as `yAxis` from t_project_water_daily where device_id in
+		(
+		select id from t_project_water_meter where project_id in(
+		select id from t_project_info where uuid = #{uuid}
+		)
+
+		<if test="type != null">
+			and	type = #{type}
+		</if>
+		)
+		and statistics_date >= '${date}'
+		GROUP BY statistics_date
+	</select>
+
+	<select id="getOneDaydegree" resultType="java.lang.Double">
+		select sum(l.degree-f.degree) degree from
+		(SELECT
+		electric_id ,
+		actual_degree degree
+		FROM t_project_water_meter_detail_${month2} where id in(
+		(select max(id) from t_project_water_meter_detail_${month2} where  DATE_FORMAT(
+		create_time,
+		'%Y-%m-%d %H:%i:%s'
+		) LIKE '${daily2}%'
+		AND electric_id IN (
+		SELECT
+		id
+		FROM
+		t_project_water_meter
+		WHERE
+		project_id = (
+		SELECT
+		id
+		FROM
+		t_project_info
+		WHERE
+		uuid = #{uuid}
+		)
+		<if test="type != null" >
+			and  `type`  = #{type}
+		</if>
+		) GROUP BY
+		electric_id
+		)
+		)
+
+		) f
+
+		LEFT JOIN
+		(SELECT
+		electric_id ,
+		actual_degree degree
+		FROM t_project_water_meter_detail_${month1} where id in(
+		(select max(id) from t_project_water_meter_detail_${month1} where  DATE_FORMAT(
+		create_time,
+		'%Y-%m-%d %H:%i:%s'
+		) LIKE '${daily1}%'
+		AND electric_id IN (
+		SELECT
+		id
+		FROM
+		t_project_water_meter
+		WHERE
+		project_id = (
+		SELECT
+		id
+		FROM
+		t_project_info
+		WHERE
+		uuid = #{uuid}
+		)
+		<if test="type != null" >
+			and  `type`  = #{type}
+		</if>
+		) GROUP BY
+		electric_id
+		)
+		)
+
+		) l on f.electric_id = l.electric_id
+
+
+	</select>
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectHelmetStockMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectHelmetStock">
+        <id column="id" property="id" />
+        <result column="device_no" property="deviceNo" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,device_no AS deviceNo, type, is_del AS isDel,status, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.device_no,
+        ${alias}.type,
+        ${alias}.status,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+    </sql>
+
+    <select id="selectPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+        c.name as createUserName
+        from t_project_device_stock a
+        left join t_sys_user c on c.id = a.create_user and  c.is_del=0
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <update id="updateStatus">
+        update t_project_device_stock set status=#{status},modify_time=now(),modify_user=#{modifyUser}
+        where type= #{type} and device_no in(
+        <foreach collection="imeis" index="index" item="item" separator="," close="" open="">
+         #{item}
+        </foreach>
+        )
+    </update>
+
+
+    <insert id="insertDeviceData">
+        insert into ${tableName} (project_id,device_no,is_online,status,comments)values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.projectId},#{item.deviceNo},#{item.isOnline},#{item.status},#{item.comments} )
+         </foreach>
+    </insert>
+
+</mapper>

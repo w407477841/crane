@@ -1,0 +1,98 @@
+server:
+  port: 9017
+
+
+xywg:
+  netty-position-port: 9014  #监听端口
+  redisHead: device_platform
+  upgrade-file-base-path: /upgrade/    #升级文件在本地的存储基础地址
+  websocket:
+    allowed-origins: http://localhost:8081,http://localhost:8080,http://192.168.1.186:8080,http://192.168.1.186:8081
+
+ali:
+  accessKeyId: LTAIM7w6KjwRXGxP
+  accessKeySecret: 2Ixpjf7Dl3EGjvbqe3AziYIoFjL5mL
+  iosAppKey: 25052872
+  androidAppKey: 25054797
+  env: DEV #DEV,PRODUCT
+
+spring:
+  redis:
+    database: 0
+    host: 192.168.1.187
+    port: 6379
+    password:
+    timeout: 3000
+    jedis:
+      pool:
+        max-active: 8 #连接池最大连接数(使用负值表示没有限制)
+        max-wait: -1  #连接池最大阻塞等待时间(负值表示没有限制)
+        max-idle: 5  #连接池中的最大空闲连接
+        min-idle: 0  #连接池中最小的空闲连接
+  mvc:
+    static-path-pattern: /static/**
+  http:
+    converters:
+      preferred-json-mapper: fastjson
+    multipart:
+      max-request-size: 100MB #最大请求大小
+      max-file-size: 100MB #最大文件大小
+  devtools:
+    restart:
+      enabled: false #是否开启开发者工具（true/false）
+      additional-paths: xywg-admin/src
+      exclude: static/**,WEB-INF/view/**
+  aop:
+    proxy-target-class: true #false为启用jdk默认动态代理,true为cglib动态代理
+##############数据库######################
+  datasource:
+    url: jdbc:mysql://192.168.1.187:3306/device_platform?autoReconnect=true&useUnicode=true&characterEncoding=utf-8&useServerPrepStmts=false&rewriteBatchedStatements=true&allowMultiQueries=true
+    username: root
+    password: Xingyun*_001
+    db-name: device_platform
+    filters: log4j,mergeStat
+#############日志##################
+
+logging:
+  level.root: info
+  file: /home/web/logs/iot/position/common.log
+  level.org.apache.tomcat: warn
+  level.org.springframework.web: warn
+  level.com.xywg.iot.modular.station.dao: error
+  level.org.apache.ibatis.session.defaults.DefaultSqlSession: error
+  level.wrapping com.mysql.cj.jdbc.ConnectionImpl: error
+
+
+###################  mybatis-plus配置  ###################
+mybatis-plus:
+  mapper-locations: classpath*:**/mapping/*.xml
+  typeAliasesPackage: com.xywg.iot.modular.*.model
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+  #  metaObjectHandler: com.xywg.equipmentmonitor.core.aop.MyMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: false
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+################ zbus 消息队列 地址 ##########################
+zbus:
+  host: 192.168.1.186:15555
+  websocket-topic: topic-websocket
+
+##################### ftp ###########################
+ftp:
+  host: 192.168.1.124
+  port: 21
+  username: jiajia
+  password: a!s@d#f$
+  root-path: device_platform
+
+localPath: /home/web/temp/position/  #临时文件存放的本地路径

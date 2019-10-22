@@ -1,0 +1,55 @@
+##########################################################
+##################  所有dev的配置  #################
+##########################################################
+
+###################  项目启动端口  ###################
+server:
+  name: accepter-whf1
+
+###################  xywg  ###################
+xywg:
+  redisYcDispatchPrefix: "xywg:yc:dispatch:"
+  redisTdDispatchPrefix: "xywg:td:dispatch:"
+################# netty 监听端口 #########################
+netty:
+  port: 9060
+
+################ zbus 消息队列 地址 ##########################
+zbus:
+  host: 192.168.1.186:15555
+  yc-data-topic: topic-yc-data
+  yc-ht-topic: topic-yc-ht
+  yc-lx-topic: topic-yc-lx
+  sjj-data-topic: topic-sjj-data
+  sjj-ht-topic: topic-sjj-ht
+  sjj-lx-topic: topic-sjj-lx
+  tj-data-topic: topic-tj-data
+  tj-ht-topic: topic-tj-ht
+  tj-lx-topic: topic-tj-lx
+  test-topic: topic-test
+  dispatch-topic: topic-dispatch
+
+###################  redis配置  ###################
+spring:
+  redis:
+    host: 192.168.1.187
+    port: 6379
+    password:
+    timeout: 3000
+    max-idle: 500
+    min-idle: 50
+    active: 2000
+    wait: 1000
+    cahce-names: xywg-sbgl-day-2,xywg-sbgl-min-30,xywg-sbgl-min-2,xywg-sbgl-hour-2
+
+
+#############日志##################
+logging:
+  level.root: info
+  file: /home/web/logs/iot/whf/xywg.log
+
+
+
+
+
+

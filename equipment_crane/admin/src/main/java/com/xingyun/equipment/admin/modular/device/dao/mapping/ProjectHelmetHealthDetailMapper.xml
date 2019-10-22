@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectHelmetHealthDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectHelmetHealthDetail">
+        <id column="id" property="id"/>
+        <result column="helmet_id" property="helmetId"/>
+        <result column="imei" property="imei"/>
+        <result column="heart_rate" property="heartRate"/>
+        <result column="blood_oxygen" property="bloodOxygen"/>
+        <result column="temperature" property="temperature"/>
+        <result column="sixAxis" property="sixAxis"/>
+        <result column="collect_time" property="collectTime"/>
+        <result column="comments" property="comments"/>
+        <result column="is_del" property="isDel"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="modify_user" property="modifyUser"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, helmet_id AS helmetId, imei, heart_rate AS heartRate, blood_oxygen AS bloodOxygen, temperature, sixAxis, collect_time AS collectTime, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, health_status AS healthStatus
+    </sql>
+    <!--查询 当前坐标数据-->
+    <select id="selectLocations" resultType="com.xingyun.equipment.admin.modular.device.dto.HealthLocation">
+          select CONCAT(bd_lng,',',bd_lat) item from t_project_helmet_position_detail_${month} where collect_time like '${daily}%' and helmet_id=#{helmetId}
+    </select>
+    <!-- 一条健康数据 -->
+    <select id="selectLastInfo" resultType="com.xingyun.equipment.admin.modular.device.dto.HealthInfo">
+        SELECT  1 as maozi,
+        (select t_project_helmet.id_card_number from t_project_helmet where t_project_helmet.id =t.helmet_id) `code` ,
+         temperature,
+         blood_oxygen oxygen,
+          '' pressures,
+          (select max(collect_time)  from t_project_helmet_health_detail_${month} where collect_time like '${daily}%' and  helmet_id=#{helmetId}  ) outTime ,
+          (select min(collect_time)  from t_project_helmet_health_detail_${month} where collect_time like '${daily}%' and  helmet_id=#{helmetId} ) inTime
+        from  t_project_helmet_health_detail_${month} t
+        where
+        <!--collect_time >= #{time} and-->
+        helmet_id=#{helmetId}
+        order by collect_time desc
+        limit 0,1
+    </select>
+    <select id="selectdetails"
+            resultType="com.xingyun.equipment.admin.modular.device.model.ProjectHelmetHealthDetail">
+SELECT
+	blood_oxygen as bloodOxygen,
+	temperature,
+	DATE_FORMAT( collect_time, '%Y-%m-%d %H' ) deviceTime,
+	collect_time as collectTime
+FROM
+	t_project_helmet_health_detail_${month}
+WHERE
+	collect_time LIKE '${daily}%'
+	AND helmet_id = #{helmetId}
+order BY
+	deviceTime
+    </select>
+    <select id="selectAlarms" resultType="com.xingyun.equipment.admin.modular.device.dto.HealthAPI3DTO">
+
+       select id, alarm_info as info , (select t_project_helmet.id_card_number from t_project_helmet where id = helmet_id) `code`
+,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') as deviceTime
+  from t_project_helmet_alarm_${month}
+  <where>
+
+
+
+      <if test="helmets!=null  and helmets.size>0">
+        helmet_id in
+          <foreach collection="helmets" separator="," open="(" close=")" item="helmet" >
+              #{helmet}
+          </foreach>
+      </if>
+      and create_time > #{time}
+    </where>
+      order by create_time desc
+    </select>
+
+
+    <select id="getDetailsById" resultType="com.xingyun.equipment.admin.modular.device.model.ProjectHelmetHealthDetail">
+        select * from
+        (
+        <foreach collection="monthList" item="item" open="(" close=")" separator="UNION ALL">
+            SELECT
+            id as id,
+            helmet_id as helmetId,
+            imei as
+            imei,
+            heart_rate as hartRate,
+            blood_oxygen as bloodOxygen,
+            temperature as temperature,
+            sixAxis as sixAxis,
+            collect_time as collectTime,
+            create_time as createTime
+            from t_project_helmet_health_detail_${item}
+            where helmet_id=#{id}
+            and is_del=0
+            <if test="beginDate!=null and beginDate!=''">
+            and collect_time &gt; #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                and collect_time &lt; #{endDate}
+            </if>
+            </foreach>
+        ) m
+        order by m.createTime desc
+    </select>
+
+
+    <select id="userlocations" resultType="com.xingyun.equipment.admin.modular.device.dto.HealthAPI4DTO">
+       select
+       (select t_project_helmet.id_card_number from t_project_helmet where id =helmet_id ) `code`,
+       CONCAT(bd_lng,',',bd_lat) location
+        from t_project_helmet_position_detail_${month}
+         where id  in (
+         select max(id) from t_project_helmet_position_detail_${month}  where helmet_id in (select id from t_project_helmet where project_id = (select id from t_project_info where uuid = #{uuid} ) ) group by helmet_id)
+         group by helmet_id
+    </select>
+
+</mapper>

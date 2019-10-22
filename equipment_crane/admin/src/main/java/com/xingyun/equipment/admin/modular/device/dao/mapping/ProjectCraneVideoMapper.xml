@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectCraneVideoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectCraneVideo">
+        <id column="id" property="id" />
+        <result column="crane_id" property="craneId" />
+        <result column="login_name" property="loginName" />
+        <result column="password" property="password" />
+        <result column="type" property="type" />
+        <result column="ip_address" property="ipAddress" />
+        <result column="port" property="port" />
+        <result column="platform_type" property="platformType" />
+        <result column="tunnel" property="tunnel" />
+        <result column="comments" property="comments" />
+        <result column="org_id" property="orgId" />
+    	<result column="is_del" property="isDel" />
+    	<result column="create_time" property="createTime" />
+    	<result column="create_user" property="createUser" />
+    	<result column="modify_time" property="modifyTime" />
+    	<result column="modify_user" property="modifyUser" />
+        <result column="appkey" property="appkey" />
+        <result column="secret" property="secret" />
+        <result column="area" property="area" />
+        <result column="http_address" property="httpAddress" />
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        crane_id,
+        login_name,
+        password,
+        ip_address,
+        port,
+        platform_type,
+        tunnel,
+        comments,
+        org_id,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+        appkey,
+        secret,
+        area,
+        http_address,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.crane_id AS ${alias}_crane_id,
+        ${alias}.login_name AS ${alias}_login_name,
+        ${alias}.password AS ${alias}_password,
+        ${alias}.ip_address AS ${alias}_ip_address,
+        ${alias}.port AS ${alias}_port,
+        ${alias}.platform_type AS ${alias}_platform_type,
+        ${alias}.tunnel AS ${alias}_tunnel,
+        ${alias}.comments AS ${alias}_comments,
+        ${alias}.org_id AS ${alias}_org_id,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+        ${alias}.appkey AS ${alias}_appkey,
+        ${alias}.secret AS ${alias}_secret,
+        ${alias}.area AS ${alias}_area,
+       ${alias}.http_address as ${alias}_http_address,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.crane_id,
+        ${alias}.login_name,
+        ${alias}.password,
+        ${alias}.ip_address,
+        ${alias}.port,
+        ${alias}.platform_type,
+        ${alias}.tunnel,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+        ${alias}.appkey,
+        ${alias}.secret,
+        ${alias}.area,
+        ${alias}.http_address,
+    </sql>
+</mapper>

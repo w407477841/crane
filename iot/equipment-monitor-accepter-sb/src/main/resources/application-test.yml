@@ -1,0 +1,39 @@
+##########################################################
+##################  所有dev的配置  #################
+##########################################################
+
+###################  项目启动端口  ###################
+server:
+  name: accepter-sb1
+################# netty 监听端口 #########################
+netty:
+  port: 9012
+################ zbus 消息队列 地址 ##########################
+zbus:
+  host: 192.168.1.64:15555
+  sb-data-topic: topic-sb-data #数据
+  sb-lx-topic: topic-sb-lx #离线
+  sb-sx-topic: topic-sb-sx #上线
+
+###################  redis配置  ###################
+spring:
+  redis:
+    host: 121.43.151.100
+    port: 6379
+    password: duanjudy@123
+    timeout: 3000
+    max-idle: 500
+    min-idle: 50
+    active: 2000
+    wait: 1000
+    cahce-names: xywg-sbgl-day-2,xywg-sbgl-min-30,xywg-sbgl-min-2,xywg-sbgl-hour-2
+
+
+############### 日志 ################
+logging:
+  file: /home/web/logs/iot/db/accepter.log
+  level: info
+
+
+
+

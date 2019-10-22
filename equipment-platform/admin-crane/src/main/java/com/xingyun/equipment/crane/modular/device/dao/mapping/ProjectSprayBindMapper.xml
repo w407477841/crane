@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectSprayBindMapper">
+
+
+    <select id="getList" resultType="com.xingyun.equipment.crane.modular.device.vo.ProjectSprayVO">
+        select
+        i.name as projectName,
+        s.device_no as deviceNo,
+        s.name as name,
+        if(s.is_online=1,'在线',"离线") as onlineName,
+        if(s.status=1,'开启','关闭') as statusName,
+        s.status as status
+        from t_project_spray_bind b
+        left join t_project_info i on i.id=b.project_id
+        left join t_project_spray s on  b.spray_id=s.id
+        where b.environment_id=#{id}
+        and b.is_del=0
+    </select>
+
+    <insert id="add" >
+        insert into t_project_spray_bind
+        (project_id,spray_id,environment_id,create_time,is_del)
+        VALUES
+        (#{p.projectId},#{p.sprayId},#{p.environmentId},now(),#{p.isDel})
+    </insert>
+
+    <update id="deleteByEnvironment">
+        update t_project_spray_bind
+        set is_del=1
+        where environment_id=#{id}
+    </update>
+
+
+</mapper>

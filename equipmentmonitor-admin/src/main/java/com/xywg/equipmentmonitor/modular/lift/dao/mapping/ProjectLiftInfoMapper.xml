@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.lift.dao.ProjectLiftInfoMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.lift.model.ProjectLiftInfo">
+        <id column="id" property="id" />
+        <result column="device_no" property="deviceNo" />
+        <result column="identifier" property="identifier" />
+        <result column="manufactor" property="manufactor" />
+        <result column="owner" property="owner" />
+        <result column="weight" property="weight" />
+        <result column="height" property="height" />
+        <result column="speed" property="speed" />
+        <result column="front_door_status" property="frontDoorStatus" />
+        <result column="back_door_status" property="backDoorStatus" />
+        <result column="status" property="status" />
+        <result column="device_time" property="deviceTime" />
+    </resultMap>
+
+    
+        <!-- 通用查询映射结果 -->
+    <resultMap id="AlarmInfoResultMap" type="com.xywg.equipmentmonitor.modular.lift.model.ProjectLiftAlarmInfo">
+        <id column="id" property="id" />
+        <result column="projectName" property="projectName" />
+        <result column="device_no" property="deviceNo" />
+        <result column="info" property="info" />
+        <result column="amount" property="amount" />
+        <result column="projectId" property="projectId" />
+        <result column="deviceTime" property="deviceTime" />
+        <result column="yearMonth" property="yearMonth" />
+        <result column="alarm_id" property="alarmId" />
+    </resultMap>
+  <!-- 通用查询映射结果 -->
+    <resultMap id="MyBaseResultMap" type="com.xywg.equipmentmonitor.modular.lift.vo.ProjectLiftListVO">
+        <id column="id" property="id" />
+        <result column="device_no" property="deviceNo" />
+        <result column="project_id" property="projectId" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="max_range" property="maxRange" />
+        <result column="max_weight" property="maxWeight" />
+        <result column="max_people" property="maxPeople" />
+        <result column="standard_height" property="standardHeight" />
+        <result column="speed" property="speed" />
+        <result column="gprs" property="gprs" />
+        <result column="status" property="status" />
+        <result column="place_point" property="placePoint" />
+        <result column="comments" property="comments" />
+        <result column="org_id" property="orgId" />
+    	<result column="projectName" property="projectName"/>
+    </resultMap>
+  <!-- 通用查询映射结果 -->
+    <resultMap id="LiftDetailMap" type="com.xywg.equipmentmonitor.modular.lift.vo.ProjectLiftListVO">
+        <id column="id" property="id" />
+        <result column="device_no" property="deviceNo" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="weight" property="weight" />
+        <result column="height" property="height" />
+        <result column="speed" property="speed" />
+        <result column="people" property="people" />
+        <result column="front_door_status" property="frontDoorStatus" />
+        <result column="back_door_status" property="backDoorStatus" />
+        <result column="name" property="dirverName"/>
+        <result column="certificate_no" property="dirverCertificateNo"/>
+        <result column="phone" property="dirverPhone"/>
+        <result column="dirver" property="dirver"/>
+        <result column="create_time" property="createTime" />
+    </resultMap>
+ <!-- 通用查询映射结果 -->
+    <resultMap id="newResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectLiftAlarmVO">
+        <id column="id" property="id" />
+        <result column="lift_id" property="liftId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="alarm_id" property="alarmId" />
+        <result column="alarm_info" property="alarmInfo" />
+    	<result column="countStatus" property="countStatus" />
+    </resultMap>
+  <!-- 升降机 -->
+    <select id="getLiftInfo" parameterType="java.util.Map" resultMap="BaseResultMap">
+      select 
+        a.device_no,
+        a.identifier,
+        a.manufactor,
+        a.owner,
+        b.weight,
+        b.height,
+        b.speed,
+        case when b.front_door_status = 0 then '关' when b.front_door_status = 1 then '开' END as front_door_status,
+        case when b.back_door_status = 0 then '关' when b.back_door_status = 1 then '开' else  '未知' End as back_door_status,
+        if(a.is_online =1,'在线','离线') as status,
+        b.device_time
+		  
+        
+        from  ${tableName} b
+        LEFT JOIN t_project_lift a on b.lift_id =a.id and b.is_del =0
+        left join t_project_info c on a.project_id = c.id
+         
+        where c.uuid = '${uuid}'
+        <if test="deviceNo !=null and deviceNo !=''">
+        and a.device_no = #{deviceNo}
+        </if>
+        and a.is_del = 0
+        
+        order by b.device_time desc 
+        LIMIT  ${offSet},${pageSize};
+        
+        
+    </select>
+    <!-- 升降机报警 -->
+        <select id="getAlarmInfo" parameterType="java.util.Map" resultMap="AlarmInfoResultMap">
+        select
+        c.name as projectName,
+        a.device_no,
+        a.alarm_id,
+        a.alarm_info as info ,  
+        count(1) as amount
+        from  ${tableName} as a
+        left join t_project_lift b on b.id= a.lift_id and b.is_del=0
+        LEFT JOIN t_project_info c on c.id = b.project_id and c.is_del=0
+        where  c.uuid in 
+        <foreach item="uuids" index="index" collection="uuids" open="("
+			separator="," close=")">
+			 '${uuids}' 
+		</foreach>
+        and a.is_del=0 
+        <if test="deviceNo!=null and deviceNo !=''">
+        and a.device_no = #{deviceNo}
+        </if>
+        <if test="alarmId !=null and alarmId !=''">
+         and  a.alarm_id =${alarmId}
+        </if>
+        
+        GROUP BY  a.alarm_id
+        LIMIT #{offSet},#{pageSize}
+     
+         
+    </select>
+    
+    
+    <!-- 升降机报警 -->
+        <select id="getLiftInfoCount" parameterType="java.util.Map" resultType="int">
+       select 
+       count(1)
+        from t_project_lift a
+        LEFT JOIN ${tableName} b on b.lift_id =a.id and b.is_del =0
+        left join t_project_info c on a.project_id = c.id
+        where c.uuid = '${uuid}'
+        <if test="deviceNo!=null and deviceNo !=''">
+        and a.device_no = #{deviceNo}
+        </if>
+        and a.is_del = 0
+       
+        
+        
+     
+         
+    </select>
+    
+     <!-- 升降机报警 -->
+        <select id="getAlarmInfoCount" parameterType="java.util.Map" resultType="int">
+       select count(dd.id) from (
+        select
+        a.id
+        from  ${tableName} as a
+        left join t_project_lift b on b.id= a.lift_id and b.is_del=0
+        LEFT JOIN t_project_info c on c.id = b.project_id and c.is_del=0
+        where  c.uuid in 
+        <foreach item="uuids" index="index" collection="uuids" open="("
+			separator="," close=")">
+			 '${uuids}' 
+		</foreach>
+        and a.is_del=0 
+        <if test="deviceNo!=null and deviceNo !=''">
+        and a.device_no = #{deviceNo}
+        </if>
+        <if test="alarmId !=null and alarmId !=''">
+         and  a.alarm_id =${alarmId}
+        </if>
+        
+        GROUP BY  a.alarm_id) as dd
+      
+     
+         
+    </select>
+    
+    
+    
+    
+        <!-- 升降机报警 -->
+        <select id="getAlarmDetail" resultType="com.xywg.equipmentmonitor.modular.lift.model.ProjectLiftAlarmInfo">
+        select
+        
+        a.alarm_info as info,
+        a.create_time as deviceTime,
+        if(a.status =1 ,'已处理','未处理') status,
+        a.modify_time as modifyTime,
+        a.modify_user_name as userName
+        from  ${tableName} a
+        left join t_project_lift b on b.id= a.lift_id and b.is_del=0
+        LEFT JOIN t_project_info c on c.id = b.project_id and c.is_del=0
+        where  a.is_del=0 
+        and a.alarm_id =${alarmId} 
+        <if test="deviceNo != null and deviceNo != ''">
+            AND a.device_no = #{deviceNo}
+        </if>
+       order by a.create_time desc
+        
+     
+         
+    </select>
+       <!--查询集团下所有升降机(接口)-->
+    <select id="getLiftList" resultMap="MyBaseResultMap">
+       SELECT
+        a.device_no,
+        a.project_id,
+        a.identifier,		
+        a.specification,			
+        a.owner,			
+        a.manufactor,			
+        a.max_weight,
+        a.max_people,			
+        a.standard_height,			
+        a.speed,			
+        a.gprs,	
+        a.is_online as status,
+
+        b.name as projectName,
+        u.name as createUserName
+        from t_project_lift a
+        left join t_project_info b on a.project_id =b.id
+        left join t_sys_user u on u.id=a.create_user
+        where a.is_del = 0
+        and a.status = 1
+        <!--<if test="orgId !=null and orgId !=''">-->
+        <!--and a.org_id = #{orgId}-->
+        <!--</if>-->
+        <if test="orgIds !=null and orgIds.size > 0">
+        and a.org_id in <foreach close=")" collection="orgIds" item="listItem" open="(" separator=",">
+            #{listItem}
+        </foreach>
+        </if>
+       
+        
+        order by a.id desc
+    </select>
+    <!--  查询升降机最近一条数据-->
+    <select id="getLiftDetail" resultMap="LiftDetailMap">
+      select 
+      b.device_no,
+      a.tilt_angle,
+      a.weight,
+      a.height,
+      a.speed,
+      a.people,
+      a.front_door_status,			
+      a.back_door_status,
+      c.name   ,
+      c.certificate_no ,
+      c.phone,
+      a.driver,
+      a.create_time
+      from ${tableName} as a
+      left join t_project_lift b on a.lift_id = b.id and b.is_del = 0
+      left join t_project_user c on c.id = a.driver and c.is_del =0
+      where a.is_del =0
+      <if test="deviceNo !=null and deviceNo !=''">
+      and b.device_no = #{deviceNo}
+      </if>
+      
+      ORDER BY a.create_time desc LIMIT 1
+      </select>
+     <!--      查询警告数量 --> 
+    <select id="getLiftAlarmCount" parameterType="java.util.Map" resultMap="newResultMap">
+    select COUNT(1) as countStatus,a.alarm_info,a.alarm_id,a.lift_id from ${tableName} as a
+    left join t_project_lift as b on b.id=a.lift_id
+     where a.is_del =0 
+   
+     
+     <if test="deviceNo !=null and deviceNo !=null">
+      and b.device_no =#{deviceNo}
+     
+     </if>
+     <if test="orgId !=null and orgId !=''">
+        and b.org_id = ${orgId}
+        </if>
+    
+    
+    GROUP BY a.alarm_id 
+    </select> 
+    
+    
+</mapper>

@@ -1,0 +1,143 @@
+##########################################################
+##################  dev的配置  #################
+##########################################################
+
+###################  项目启动端口  ###################
+server:
+  port: 9092
+
+
+###################  xywg配置  ###################
+xywg:
+  swagger-open: true #是否开启swagger (true/false)
+  auth-open: true
+  sign-open: false #签名机制是否开启(true或false)
+  #file-upload-path: d:/tmp  #文件上传目录(不配置的话为java.io.tmpdir目录)
+  muti-datasource-open: false #是否开启多数据源(true/false)
+  spring-session-open: false #是否开启spring session,如果是多机环境需要开启(true/false)
+  session-invalidate-time: 1800 #session失效时间(只在单机环境下生效，多机环境在SpringSessionConfig类中配置) 单位：秒
+  session-validation-interval: 900 #多久检测一次失效的session(只在单机环境下生效) 单位：秒
+  netty-server-ports: 7777 #服务端口   , 分割
+  netty-Heart-port: 8888  #心跳
+  default-password: 123456 # 默认密码
+##########################################################
+###################  任务调度配置        ###################
+##########################################################
+  job:
+    admin:
+      addresses: http://192.168.1.186:8083
+    executor:
+      appname: job-executor-labor
+      ip:
+      port: 9999
+      logpath: logs/xxl-job/jobhandler
+      logretentiondays: -1
+    accessToken: xywg666
+
+
+########################zbus##############
+
+zbus:
+  address: 192.168.1.187:15555
+  address-iot: 192.168.1.186:15555
+  topic: sbts-001,sbts-002
+  yc-data-topic: topic-yc-data
+  yc-ht-topic: topic-yc-ht
+  yc-lx-topic: topic-yc-lx
+  sjj-data-topic: topic-sjj-data
+  sjj-ht-topic: topic-sjj-ht
+  sjj-lx-topic: topic-sjj-lx
+  tj-data-topic: topic-tj-data
+  tj-ht-topic: topic-tj-ht
+  tj-lx-topic: topic-tj-lx
+  websocket-topic: topic-websocket
+###################  spring配置  ###################
+
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.1.187:3306/device_platform?autoReconnect=true&useUnicode=true&characterEncoding=utf-8&useServerPrepStmts=false&rewriteBatchedStatements=true&allowMultiQueries=true
+    username: root
+    password: Xingyun*_001
+    db-name: device_platform
+    filters: log4j,mergeStat
+  redis:
+    host: 192.168.1.187
+    port: 6379
+    password:
+    timeout: 3000
+    max-idle: 500
+    min-idle: 50
+    active: 2000
+    wait: 1000
+    cahce-names: xywg-sbgl-year-2,xywg-sbgl-day-2,xywg-sbgl-min-30,xywg-sbgl-min-2,xywg-sbgl-hour-2
+  mvc:
+    static-path-pattern: /static/**
+    view:
+      prefix: /WEB-INF/view
+      imagePath: /labor/
+      imageLocalPath: http://192.168.1.124:8080/labor/
+  http:
+    converters:
+      preferred-json-mapper: fastjson
+    multipart:
+      max-request-size: 100MB #最大请求大小
+      max-file-size: 100MB #最大文件大小
+  devtools:
+    restart:
+      enabled: false #是否开启开发者工具（true/false）
+      additional-paths: xywg-admin/src
+      exclude: static/**,WEB-INF/view/**
+  aop:
+    proxy-target-class: true #false为启用jdk默认动态代理,true为cglib动态代理
+
+
+
+###################  mybatis-plus配置  ###################
+mybatis-plus:
+  mapper-locations: classpath*:com/xywg/equipmentmonitor/**/mapping/*.xml
+  typeAliasesPackage: com.xywg.equipmentmonitor.modular.system.model
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+    metaObjectHandler: com.xywg.equipmentmonitor.core.aop.MyMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: false
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+logging:
+  level.root: warn
+#  level.com.stylefeng: debug
+#  path: /home/web/logs/equipment/
+  path: /home/web/logs/equipment/
+  file: xywg.log
+
+
+jwt:
+  header: Authorization
+  secret: defaultSecret
+  expiration: 14400000
+  authPath: xywg
+  md5Key: randomKey
+
+
+remote:
+  url:
+    project: http://192.168.1.185:8081
+
+iot:
+  url: 192.168.1.186:9091
+
+##################### ftp ###########################
+ftp:
+  host: 192.168.1.124
+  port: 21
+  username: jiajia
+  password: a!s@d#f$
+  root-path: device_platform

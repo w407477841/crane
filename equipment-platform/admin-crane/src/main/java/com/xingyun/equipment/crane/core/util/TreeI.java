@@ -1,0 +1,21 @@
+package com.xingyun.equipment.crane.core.util;
+
+import java.util.List;
+/**
+ * 
+ * @author 树形对象接口
+ *
+ */
+public interface  TreeI{
+
+	  Integer getId();
+	  Integer getPid();
+	  List<? extends TreeI >  getChildren();
+	  void setChildren(List<? extends TreeI> children);
+	  
+	  
+	  
+	  String getCode();
+	  String getPcode();
+	
+}

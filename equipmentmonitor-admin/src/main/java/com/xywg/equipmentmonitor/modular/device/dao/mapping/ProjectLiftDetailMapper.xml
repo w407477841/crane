@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectLiftDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectLiftDetail">
+        <id column="id" property="id" />
+        <result column="lift_id" property="liftId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="driver" property="driver" />
+        <result column="device_time" property="deviceTime" />
+        <result column="weight" property="weight" />
+        <result column="height" property="height" />
+        <result column="speed" property="speed" />
+        <result column="people" property="people" />
+        <result column="front_door_status" property="frontDoorStatus" />
+        <result column="back_door_status" property="backDoorStatus" />
+        <result column="status" property="status" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="floor" property="floor" />
+        <result column="floor_start" property="floorStart" />
+        <result column="floor_end" property="floorEnd" />
+        <result column="key1" property="key1" />
+        <result column="key2" property="key2" />
+        <result column="key3" property="key3" />
+        <result column="key4" property="key4" />
+        <result column="key5" property="key5" />
+        <result column="key6" property="key6" />
+        <result column="key7" property="key7" />
+        <result column="key8" property="key8" />
+        <result column="key9" property="key9" />
+        <result column="key10" property="key10" />
+    	<result column="is_del" property="isDel" />
+    	<result column="create_time" property="createTime" />
+    	<result column="create_user" property="createUser" />
+    	<result column="modify_time" property="modifyTime" />
+    	<result column="modify_user" property="modifyUser" />
+    </resultMap>
+    <!--用于查询近7小时升降机载重接口-->
+    <resultMap id="weightResultMap" type="com.xywg.equipmentmonitor.modular.station.dto.LiftDetailWeightVO">
+
+        <result column="weight" property="weight" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+    
+     <resultMap id="HeartbeatResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectLiftHeartbeat">
+        <id column="id" property="id" />
+        <result column="lift_id" property="liftId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="status" property="status" />
+    	<result column="create_time" property="createTime" />
+    	<result column="end_time" property="endTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        lift_id,
+        device_no,
+        driver,
+        device_time,
+        weight,
+        height,
+        speed,
+        people,
+        front_door_status,
+        back_door_status,
+        status,
+        tilt_angle,
+        floor,
+        floor_start,
+        floor_end,
+        key1,
+        key2,
+        key3,
+        key4,
+        key5,
+        key6,
+        key7,
+        key8,
+        key9,
+        key10,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.lift_id AS ${alias}_lift_id,
+        ${alias}.device_no AS ${alias}_device_no,
+        ${alias}.driver AS ${alias}_driver,
+        ${alias}.device_time AS ${alias}_device_time,
+        ${alias}.weight AS ${alias}_weight,
+        ${alias}.height AS ${alias}_height,
+        ${alias}.speed AS ${alias}_speed,
+        ${alias}.people AS ${alias}_people,
+        ${alias}.front_door_status AS ${alias}_front_door_status,
+        ${alias}.back_door_status AS ${alias}_back_door_status,
+        ${alias}.status AS ${alias}_status,
+        ${alias}.tilt_angle AS ${alias}_tilt_angle,
+        ${alias}.floor AS ${alias}_floor,
+        ${alias}.floor_start AS ${alias}_floor_start,
+        ${alias}.floor_end AS ${alias}_floor_end,
+        ${alias}.key1 AS ${alias}_key1,
+        ${alias}.key2 AS ${alias}_key2,
+        ${alias}.key3 AS ${alias}_key3,
+        ${alias}.key4 AS ${alias}_key4,
+        ${alias}.key5 AS ${alias}_key5,
+        ${alias}.key6 AS ${alias}_key6,
+        ${alias}.key7 AS ${alias}_key7,
+        ${alias}.key8 AS ${alias}_key8,
+        ${alias}.key9 AS ${alias}_key9,
+        ${alias}.key10 AS ${alias}_key10,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.lift_id,
+        ${alias}.device_no,
+        ${alias}.driver,
+        ${alias}.device_time,
+        ${alias}.weight,
+        ${alias}.height,
+        ${alias}.speed,
+        ${alias}.people,
+        ${alias}.front_door_status,
+        ${alias}.back_door_status,
+        ${alias}.status,
+        ${alias}.tilt_angle,
+        ${alias}.floor,
+        ${alias}.floor_start,
+        ${alias}.floor_end,
+        ${alias}.key1,
+        ${alias}.key2,
+        ${alias}.key3,
+        ${alias}.key4,
+        ${alias}.key5,
+        ${alias}.key6,
+        ${alias}.key7,
+        ${alias}.key8,
+        ${alias}.key9,
+        ${alias}.key10,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+    </sql>
+    <!-- 运行数据 -->
+    <select id="selectOperationData"  resultMap="BaseResultMap" >
+     select 
+     device_time,																				
+     weight	,																				
+     people	,																				
+     floor	,																				
+     tilt_angle	,																				
+     driver,																					
+     status																			
+    
+    from ${tableName}
+    where is_del=0 and lift_id = ${id}
+     <if test="deviceTimeBegin !=null and deviceTimeEnd !=null">
+      and device_time between ${deviceTimeBegin} and ${deviceTimeEnd}
+     
+     </if> 
+      <if test="status !=null ">
+      and      status = ${status}
+     
+     </if> 
+    ORDER BY device_time desc
+    
+    
+    </select>
+    <!-- 实时监控状态 -->
+    <select id="selectMonitorStatus"  resultMap="HeartbeatResultMap" >
+     select 
+     id,
+     lift_id,
+     device_no,
+     status,
+     create_time,
+    ifnull(end_time,now()) as end_time
+																	
+    
+    from ${tableName}
+    where  lift_id = ${id} 
+     <if test="deviceTimeBegin !=null and deviceTimeEnd !=null">
+      and create_time between ${deviceTimeBegin} and ${deviceTimeEnd}
+     
+     </if> 
+    ORDER BY end_time desc
+    
+    
+    </select>
+
+
+    <select id="getMonitorData" resultType="com.xywg.equipmentmonitor.core.vo.CurrentLiftDataVO">
+        select m.deviceNo,m.deviceTime,m.weight,m.height,m.speed,m.frontDoorStatus,m.backDoorStatus  ,m.status, lift.identifier,lift.manufactor,lift.owner  from (
+        <foreach collection="months"  item="month"  open="" close="" separator="UNION ALL" >
+
+            SELECT
+            device_no as deviceNo,
+            device_time as deviceTime,
+            weight as weight,
+            height as height,
+            speed as speed,
+            case front_door_status
+            when 0 then '关闭'
+            when 1 then '开启'
+            end as frontDoorStatus ,
+            case back_door_status
+            when 0 then '关闭'
+            when 1 then '开启'
+            end as backDoorStatus,
+            '在线' as status,
+            lift_id liftId
+            FROM
+            t_project_lift_detail_${month}
+            where
+            <!--
+            device_time between  #{startTime} and #{endTime}
+            and-->
+            is_del = 0
+            and lift_id  = (
+            select id from  t_project_lift
+            where device_no = #{deviceNo}
+            and project_id  = (
+            select id from t_project_info where uuid = #{uuid}
+            )
+            )
+           order by device_time limit 1
+        </foreach>
+        ) m
+        left join
+        t_project_lift lift  on lift.id = m.liftId
+
+
+
+
+
+        order by deviceTime
+
+    </select>
+
+
+   <select id="changeToChart" resultType="map">
+SELECT
+    ${columnName} as name,
+    min(concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),if(floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}=0,'00',floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}),':00')) AS time  
+    
+    FROM
+    ${tableName}
+    where lift_id=#{id} and  device_time >= DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00' ) - interval #{total} minute
+    GROUP BY concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step},':00')
+    <if test="tableName1 !=null">
+	union all
+	SELECT
+    ${columnName} as name,
+      min(concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),if(floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}=0,'00',floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}),':00')) AS time
+    
+    FROM
+    ${tableName1}
+    where lift_id=#{id} and  device_time >= DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00' ) - interval #{total} minute
+    GROUP BY concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step},':00')
+	</if>
+    </select>
+ <select id="changeToChartAuto" resultType="map">
+SELECT
+    ${columnName} as name,
+     min(concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),if(floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}=0,'00',floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}),':00')) AS time 
+    
+    FROM
+    ${tableName}
+    where lift_id=#{id} and  DATE_FORMAT(device_time,'%Y-%m-%d') between #{beginDate} and #{endDate}
+    GROUP BY concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step},':00')
+    <if test="tableName1 !=null">
+	union all
+	SELECT
+    ${columnName} as name,
+    min(concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),if(floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}=0,'00',floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step}),':00')) AS time
+    FROM
+     ${tableName1}
+    where lift_id=#{id} and  DATE_FORMAT(device_time,'%Y-%m-%d') between #{beginDate} and #{endDate}
+    GROUP BY concat(DATE_FORMAT(device_time, '%Y-%m-%d %H:'),floor(DATE_FORMAT(device_time, '%i')/#{step})*#{step},':00')
+	</if>
+    </select>
+    <select id="getWeight" resultMap="weightResultMap">
+        select * from (
+        <foreach collection="months"  item="month"  open="" close="" separator="UNION ALL" >
+
+            SELECT
+            weight,create_time
+            FROM
+            t_project_lift_detail_${month}
+            where
+            create_time between  #{startTime} and #{endTime}
+            and
+            is_del = 0
+            and lift_id  = #{lift_id}
+        </foreach>
+        ) m
+        order by create_time
+
+
+    </select>
+    
+</mapper>

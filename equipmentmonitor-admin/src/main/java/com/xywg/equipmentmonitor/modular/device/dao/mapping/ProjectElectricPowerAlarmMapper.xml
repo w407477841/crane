@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectElectricPowerAlarmMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectElectricPowerAlarm">
+        <id column="id" property="id" />
+        <result column="electric_id" property="electricId" />
+        <result column="detail_id" property="detailId" />
+        <result column="alarm_id" property="alarmId" />
+        <result column="alarm_info" property="alarmInfo" />
+        <result column="status" property="status" />
+        <result column="modify_user_name" property="modifyUserName" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, electric_id AS electricId, detail_id AS detailId, alarm_id AS alarmId, alarm_info AS alarmInfo, status, modify_user_name AS modifyUserName, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+    
+    <select id="selectPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_project_electric_power_alarm a
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="getAlarmByDateTime"
+            resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectElectricPowerAlarm">
+        select * from (
+        <foreach collection="alarm.months" item="month" open="" close="" separator="UNION ALL">
+            select
+            <include refid="Base_Column_List"/>
+            from t_project_electric_power_alarm_${month}
+            where is_del=0
+            <if test="alarm.monitorId!=null  ">
+                and electric_id = #{alarm.monitorId}
+            </if>
+            <if test="alarm.beginTime!=null and  alarm.beginTime!=''">
+                and create_time >= #{alarm.beginTime}
+            </if>
+            <if test="alarm.endTime!=null and  alarm.endTime!='' ">
+                and create_time &lt;= #{alarm.endTime}
+            </if>
+        </foreach>
+        ) m
+        order by createTime desc
+    </select>
+
+
+    <select id="getPageAlarmByDateTime"
+            resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectElectricPowerAlarm">
+        select * from (
+        <foreach collection="alarm.months" item="month" open="" close="" separator="UNION ALL">
+            select
+            date_format(create_time, '%Y-%m-%d %H:%i:%s') as alarmTime,
+            <include refid="Base_Column_List"/>
+            from t_project_electric_power_alarm_${month}
+            where is_del=0
+            <if test="alarm.monitorId!=null  ">
+                and electric_id = #{alarm.monitorId}
+            </if>
+            <if test="alarm.beginTime!=null and  alarm.beginTime!=''">
+                and create_time >= #{alarm.beginTime}
+            </if>
+            <if test="alarm.endTime!=null and  alarm.endTime!='' ">
+                and create_time &lt;= #{alarm.endTime}
+            </if>
+        </foreach>
+        ) m
+        order by createTime desc
+    </select>
+
+</mapper>

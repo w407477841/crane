@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectEnvironmentMonitorAlarmMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectEnvironmentMonitorAlarm">
+        <id column="id" property="id"/>
+        <result column="monitor_id" property="monitorId"/>
+        <result column="alarm_id" property="alarmId"/>
+        <result column="device_no" property="deviceNo"/>
+        <result column="alarm_info" property="alarmInfo"/>
+        <result column="is_del" property="isDel"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="modify_user" property="modifyUser"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, monitor_id AS monitorId,alarm_id as alarmId, device_no AS deviceNo, alarm_info AS alarmInfo, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <select id="selectPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_project_environment_monitor_alarm a
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="getAlarmByDateTime"
+            resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectEnvironmentMonitorAlarm">
+        select * from (
+        <foreach collection="alarm.months" item="month" open="" close="" separator="UNION ALL">
+            select
+            <include refid="Base_Column_List"/>
+            from t_project_environment_monitor_alarm_${month}
+            where is_del=0
+            <if test="alarm.monitorId!=null  ">
+                and monitor_id = #{alarm.monitorId}
+            </if>
+            <if test="alarm.beginTime!=null and  alarm.beginTime!=''">
+                and create_time >= #{alarm.beginTime}
+            </if>
+            <if test="alarm.endTime!=null and  alarm.endTime!='' ">
+                and create_time &lt;= #{alarm.endTime}
+            </if>
+        </foreach>
+        ) m
+        order by createTime desc
+    </select>
+
+
+    <select id="getPageAlarmByDateTime"
+            resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectEnvironmentMonitorAlarm">
+        select * from (
+        <foreach collection="alarm.months" item="month" open="" close="" separator="UNION ALL">
+            select
+            date_format(create_time, '%Y-%m-%d %H:%i:%s') as alarmTime,
+            <include refid="Base_Column_List"/>
+            from t_project_environment_monitor_alarm_${month}
+            where is_del=0
+            <if test="alarm.monitorId!=null  ">
+                and monitor_id = #{alarm.monitorId}
+            </if>
+            <if test="alarm.beginTime!=null and  alarm.beginTime!=''">
+                and create_time >= #{alarm.beginTime}
+            </if>
+            <if test="alarm.endTime!=null and  alarm.endTime!='' ">
+                and create_time &lt;= #{alarm.endTime}
+            </if>
+        </foreach>
+        ) m
+        order by createTime desc
+    </select>
+
+    <update id="updateAlarm">
+
+        update ${tableName} set status = 1 ,
+        modify_user = #{userId},
+        modify_user_name = #{userName},
+        modify_time = DATE_FORMAT(now(),'%Y-%m-%d %T')
+
+        where id = #{id} and status = 0
+
+    </update>
+
+    <select id="selectDeviceUUID" resultType="com.xywg.equipmentmonitor.modular.device.vo.DeviceUUIDVO" >
+
+        select id, device_no as deviceNo,  (select uuid from t_project_info where t_project_info.is_del =0 and    t_project_info.id = (select project_id from ${deviceTable} where is_del = 0 and ${deviceTable}.device_no =  ${alarmTable}.device_no  )  ) uuid from ${alarmTable} where id = #{id}
+
+    </select>
+
+
+    <select id="selectModifyUserName" resultType="java.lang.String">
+
+        select modify_user_name from ${tableName} where id=#{id}
+
+    </select>
+
+    <select id="getMonitorDetails" resultType="java.util.Map">
+
+        select 1 flag ,detail.*  from  t_project_environment_monitor_detail_${month} detail where detail.id in (
+        <foreach collection="ids" item="item" separator="," open="" close="">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <select id="getLiftDetails" resultType="java.util.Map">
+
+        select 2 flag ,detail.*  from  t_project_lift_detail_${month} detail where detail.id in (
+        <foreach collection="ids" item="item" separator="," open="" close="">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <select id="getCraneDetails" resultType="java.util.Map">
+
+        select 3 flag ,detail.*  from  t_project_crane_detail_${month} detail where detail.id in (
+        <foreach collection="ids" item="item" separator="," open="" close="">
+            #{item}
+        </foreach>
+        )
+    </select>
+    <select id="getAlarmAccount" resultType="java.lang.Integer">
+            select sum(acount) account from
+(
+      select  count(1) acount from t_project_environment_monitor_alarm_${month} ma
+        <if test="monitorIds != null and monitorIds.length>0">
+            where ma.monitor_id in
+
+            (
+            <foreach collection="monitorIds" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="monitorIds == null or monitorIds.length==0 ">
+            where 1=2
+        </if>
+
+        union ALL
+
+        select count(1) acount from t_project_lift_alarm_${month} la
+
+        <if test="liftIds != null and liftIds.length>0">
+            where la.lift_id in
+            (
+            <foreach collection="liftIds" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="liftIds == null or liftIds.length==0 ">
+            where 1=2
+        </if>
+        UNION ALL
+
+        select count(1) acount from t_project_crane_alarm_${month} ca
+
+
+        <if test="craneIds != null and craneIds.length>0">
+            where ca.crane_id in
+            (
+            <foreach collection="craneIds" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="craneIds == null or craneIds.length==0 ">
+            where 1=2
+        </if>
+) m
+    </select>
+    <!-- 查询当月 所有未处理的报警-->
+    <select id="getAlarmInfo" resultType="com.xywg.equipmentmonitor.modular.device.vo.AlarmInfoVO">
+        select * from (
+        select 1 flag ,ma.monitor_id as deviceId,ma.id , ma.detail_id as detailId ,ma.alarm_id as alarmId, ma.alarm_info alarmInfo, ma.device_no deviceNo
+        ,ma.`status`,DATE_FORMAT(ma.create_time ,'%Y-%m-%d %H:%i:%S')deviceTime,ma.create_time
+
+        from t_project_environment_monitor_alarm_${month} ma
+        <if test="monitorIds != null and monitorIds.length>0">
+            where ma.monitor_id in
+
+            (
+            <foreach collection="monitorIds" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="monitorIds == null or monitorIds.length==0 ">
+            where 1=2
+        </if>
+        union ALL
+
+        select 2 flag ,la.lift_id as deviceId,la.id ,la.detail_id as detailId ,la.alarm_id as alarmId, la.alarm_info alarmInfo, la.device_no deviceNo
+        ,la.`status` ,DATE_FORMAT(la.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime,la.create_time
+
+        from t_project_lift_alarm_${month} la
+
+        <if test="liftIds != null and liftIds.length>0">
+            where la.lift_id in
+            (
+            <foreach collection="liftIds" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="liftIds == null or liftIds.length==0 ">
+            where 1=2
+        </if>
+
+
+        UNION ALL
+
+        select 3 flag ,ca.crane_id as deviceId,ca.id ,ca.detail_id as detailId ,ca.alarm_id as alarmId , ca.alarm_info alarmInfo, ca.device_no deviceNo
+        ,ca.`status` ,DATE_FORMAT(ca.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime,ca.create_time
+        from t_project_crane_alarm_${month} ca
+
+
+        <if test="craneIds != null and craneIds.length>0">
+            where ca.crane_id in
+            (
+            <foreach collection="craneIds" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="craneIds == null or craneIds.length==0 ">
+            where 1=2
+        </if>
+
+        )
+        m order by create_time desc
+    </select>
+
+    <!-- 查询当月 所有未处理的报警-->
+    <select id="getAlarmInfoByFlag" resultType="com.xywg.equipmentmonitor.modular.device.vo.AlarmInfoVO">
+        select * from (
+        <if test="flag == 1">
+
+            select 1 flag ,ma.monitor_id as deviceId,ma.id , ma.detail_id as detailId ,ma.alarm_id as alarmId, ma.alarm_info alarmInfo, ma.device_no deviceNo
+            ,ma.`status`,DATE_FORMAT(ma.create_time ,'%Y-%m-%d %H:%i:%S')deviceTime,ma.create_time
+
+            from t_project_environment_monitor_alarm_${month} ma
+            <if test="ids != null and ids.length>0">
+                where ma.monitor_id in
+
+                (
+                <foreach collection="ids" item="item" separator="," open="" close="">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="ids == null or ids.length==0 ">
+                where 1=2
+            </if>
+        </if>
+        <if test="flag == 2">
+            select 2 flag ,la.lift_id as deviceId,la.id ,la.detail_id as detailId ,la.alarm_id as alarmId, la.alarm_info alarmInfo, la.device_no deviceNo
+            ,la.`status` ,DATE_FORMAT(la.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime,la.create_time
+
+            from t_project_lift_alarm_${month} la
+
+            <if test="ids != null and ids.length>0">
+                where la.lift_id in
+                (
+                <foreach collection="ids" item="item" separator="," open="" close="">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="ids == null or ids.length==0 ">
+                where 1=2
+            </if>
+
+        </if>
+
+
+
+<if test="flag == 3">
+    select 3 flag ,ca.crane_id as deviceId,ca.id ,ca.detail_id as detailId ,ca.alarm_id as alarmId , ca.alarm_info alarmInfo, ca.device_no deviceNo
+    ,ca.`status` ,DATE_FORMAT(ca.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime,ca.create_time
+    from t_project_crane_alarm_${month} ca
+
+
+    <if test="ids != null and ids.length>0">
+        where ca.crane_id in
+        (
+        <foreach collection="ids" item="item" separator="," open="" close="">
+            #{item}
+        </foreach>
+        )
+    </if>
+    <if test="ids == null or ids.length==0 ">
+        where 1=2
+    </if>
+
+</if>
+        )
+        m order by create_time desc
+    </select>
+
+
+    <select id="getAlarms2yjgj"
+            resultType="com.xywg.equipmentmonitor.modular.station.vo.ProjectEnvironmentMonitorAlarmVO">
+        select em.device_no deviceNo,ma.alarm_id as alarmId,ma.alarm_info as alarmInfo,ma.create_time as createTime
+         ,
+	(case ma.alarm_id
+	when 1 then md.weight
+	when 2 then md.weight
+	when 3 then md.range
+	when 4 then md.range
+	when 5 then md.range
+	when 6 then md.range
+	when 7 then md.height
+	when 8 then md.height
+	when 9 then md.moment
+	when 10 then md.moment
+	when 15 then md.wind_speed
+	when 16 then md.tilt_angle
+	END) as dataInfo
+
+         from t_project_crane em
+
+inner join
+
+t_project_crane_alarm_${month} ma
+
+on em.id = ma.crane_id
+
+inner join
+
+t_project_crane_detail_${month} md
+on ma.detail_id = md.id
+
+where   em.project_id = #{projectId} and em.is_del =0 and ma.create_time>'${time}'
+<if test="status!=null">
+    and ma.status = #{status}
+</if>
+<if test="deviceNo!=null and deviceNo!=''">
+   and em.device_no = #{deviceNo}
+</if>
+
+  order by  ma.create_time asc
+    </select>
+
+    <select id="getLiftAlarms2zhgd"
+            resultType="com.xywg.equipmentmonitor.modular.station.vo.ProjectEnvironmentMonitorAlarmVO">
+        select em.device_no deviceNo,ma.alarm_id as alarmId,ma.alarm_info as alarmInfo,ma.create_time as createTime
+        ,
+        (case ma.alarm_id
+        when 1 then md.weight
+        when 2 then md.weight
+        when 3 then md.speed
+        when 4 then md.front_door_status
+        when 5 then md.back_door_status
+        END) as dataInfo
+
+        from t_project_lift em
+
+        inner join
+
+        t_project_lift_alarm_${month} ma
+
+        on em.id = ma.lift_id
+
+        inner join
+
+        t_project_lift_detail_${month} md
+        on ma.detail_id = md.id
+
+        where   em.project_id = #{projectId} and em.is_del =0 and ma.create_time>'${time}'
+        <if test="status!=null">
+            and ma.status = #{status}
+        </if>
+        <if test="deviceNo!=null and deviceNo!=''">
+            and em.device_no = #{deviceNo}
+        </if>
+
+        order by  ma.create_time asc
+    </select>
+
+
+    <select id="getAlarms2zhgd"
+            resultType="com.xywg.equipmentmonitor.modular.station.vo.ProjectEnvironmentMonitorAlarmVO">
+
+        select em.device_no deviceNo,ma.alarm_id as alarmId,ma.alarm_info as alarmInfo,ma.create_time as createTime
+         ,
+	(case ma.alarm_id
+	when 1 then md.pm25
+	when 2 then md.pm25
+	when 3 then md.pm10
+	when 4 then md.pm10
+	when 5 then md.temperature
+	when 6 then md.temperature
+	when 7 then md.temperature
+	when 8 then md.temperature
+	when 9 then md.humidity
+	when 10 then md.humidity
+	when 11 then md.humidity
+	when 12 then md.humidity
+	when 13 then md.noise
+	when 14 then md.noise
+	when 15 then md.wind_speed
+	when 16 then md.wind_speed
+	when 19 then md.wind_force
+	when 20 then md.wind_force
+	END) as dataInfo
+
+         from t_project_environment_monitor em
+
+inner join
+
+t_project_environment_monitor_alarm_${month} ma
+
+on em.id = ma.monitor_id
+
+inner join
+
+t_project_environment_monitor_detail_${month} md
+on ma.detail_id = md.id
+
+where em.project_id = #{projectId} and em.is_del =0 and ma.create_time>'${time}'
+  order by  ma.create_time asc
+
+    </select>
+
+
+</mapper>

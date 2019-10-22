@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.tj.dao.ProjectCraneMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.tj.model.ProjectCrane">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="device_no" property="deviceNo" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="max_range" property="maxRange" />
+        <result column="max_weight" property="maxWeight" />
+        <result column="standard_height" property="standardHeight" />
+        <result column="fix_moment" property="fixMoment" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="type" property="type" />
+        <result column="login_name" property="loginName" />
+        <result column="password" property="password" />
+        <result column="ip_address" property="ipAddress" />
+        <result column="port" property="port" />
+        <result column="platform_type" property="platformType" />
+        <result column="tunnel" property="tunnel" />
+    </resultMap>
+
+    <select id="selectDeviceNoOfNeedDispatch" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select
+            device_no
+        from t_project_crane
+        where is_del=0 and need_dispatch=#{dispatch}
+    </select>
+
+
+
+</mapper>

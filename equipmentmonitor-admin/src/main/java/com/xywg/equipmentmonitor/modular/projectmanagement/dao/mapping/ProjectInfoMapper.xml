@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.projectmanagement.dao.ProjectInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.projectmanagement.model.ProjectInfo">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="begin_date" property="beginDate" />
+        <result column="end_date" property="endDate" />
+        <result column="address" property="address" />
+        <result column="type" property="type" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, begin_date AS beginDate, end_date AS endDate, address, type, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+
+    <select id="selectProjectInfo" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.projectmanagement.vo.ProjectInfoVo">
+        SELECT
+        pi.id, pi.name, pi.begin_date AS beginDate, pi.end_date AS endDate, pi.address, pi.type, pi.comments,
+        pi.create_time AS createTime, pi.create_user AS createUser, pi.org_id AS orgId,u.name AS createUserName,
+        pi.position,pi.construction_unit AS constructionUnit,pi.builder,pi.manager,pa.name AS positionName,
+        o.name AS builderName,pi.uuid,pi.status,pi.project_scope AS projectScope,pi.ichnography,
+        ac.name AS applicationName
+        FROM
+        t_project_info pi
+        LEFT JOIN
+        t_sys_user u
+        ON u.id = pi.create_user
+        LEFT JOIN
+        t_project_area pa
+        ON pa.id = pi.position
+        LEFT JOIN
+        t_sys_organization o
+        ON o.id = pi.builder
+        LEFT JOIN
+        t_project_application_config ac
+        ON ac.topic = pi.topic
+        WHERE pi.is_del = 0 AND (pi.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        OR pi.builder IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        )
+        <if test="key != null and key != ''">
+            AND pi.id = #{key}
+        </if>
+        <if test="orgId != null and orgId != ''">
+            AND pi.org_id = #{orgId}
+        </if>
+        ORDER BY pi.create_time DESC
+    </select>
+
+    <select id="getProjectInfo" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.projectmanagement.vo.ProjectInfoVo">
+        SELECT
+        id AS value,name AS label
+        FROM
+        t_project_info
+        WHERE is_del = 0 AND (org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        OR builder IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <select id="selectProject"  resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        t_project_info
+        WHERE is_del = 0 AND (org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        OR builder IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <update id="bindingProject" parameterType="com.xywg.equipmentmonitor.modular.projectmanagement.vo.ProjectInfoVo">
+        UPDATE
+        t_project_info
+        SET
+        uuid = #{uuid}
+        WHERE id = #{projectId}
+    </update>
+
+    <select id="getProjectByName" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        t_project_info
+        WHERE is_del = 0 AND name = #{name} AND builder = #{builder}
+        <if test="id != null and id != ''">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="selectProjectById" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.projectmanagement.vo.ProjectInfoVo">
+        SELECT
+        id,name,begin_date AS beginDate,end_date AS endDate,position,address,type,introduction,builder,surveyor,building_size AS buildingSize,
+        supervisor,construction_unit AS constructionUnit,manager,manager_phone AS managerPhone,fix_days AS fixDays,
+        place_point AS placePoint,uuid,comments,create_time AS createTime,create_user AS createUser,org_id AS orgId,project_scope AS projectScope,ichnography
+        FROM
+        t_project_info
+        WHERE is_del = 0 AND id = #{id}
+    </select>
+
+    <select id="selectExceedCountByOrgId" parameterType="java.util.Map" resultType="java.lang.Integer">
+
+ SELECT
+        COUNT(s.amount)
+        FROM
+        (SELECT
+        COUNT(ema.monitor_id) AS amount,pi.name
+        FROM
+        t_project_info pi
+        LEFT JOIN
+        t_project_environment_monitor em
+        ON pi.id = em.project_id
+        LEFT JOIN
+        (select monitor_id from  ${tableName} group by monitor_id) ema
+        ON ema.monitor_id = em.id
+        WHERE pi.is_del = 0 AND pi.org_id = #{orgId}
+        GROUP BY pi.name HAVING amount > 0) s
+
+    </select>
+
+    <select id="selectDeviceByProjectId" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.projectmanagement.vo.ProjectInfoVo">
+        SELECT
+        'crane' AS category,device_no AS deviceNo
+        FROM
+        t_project_crane
+        WHERE is_del = 0 AND project_id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT
+        'electric' AS category,device_no AS deviceNo
+        FROM
+        t_project_electric_power
+        WHERE is_del = 0 AND project_id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT
+        'monitor' AS category,device_no AS deviceNo
+        FROM
+        t_project_environment_monitor
+        WHERE is_del = 0 AND project_id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT
+        'lift' AS category,device_no AS deviceNo
+        FROM
+        t_project_lift
+        WHERE is_del = 0 AND project_id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT
+        'water' AS category,device_no AS deviceNo
+        FROM
+        t_project_water_meter
+        WHERE is_del = 0 AND project_id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getProjectCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+        COUNT(id)
+        FROM
+        t_project_info
+        WHERE is_del = 0 AND (org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        OR builder IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+</mapper>

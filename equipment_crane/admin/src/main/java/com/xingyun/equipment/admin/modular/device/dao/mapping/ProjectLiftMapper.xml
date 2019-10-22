@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectLiftMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.vo.ProjectLiftVO">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="maxWeight" property="maxWeight" />
+        <result column="maxPeople" property="maxPeople" />
+        <result column="standardHeight" property="standardHeight" />
+        <result column="speed" property="speed" />
+        <result column="isOnline" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="createTime" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="deviceNo" property="deviceNo" />
+        <result column="name" property="name" />
+        <result column="placePoint" property="placePoint" />
+    </resultMap>
+
+    <resultMap id ="newResultMap" type="com.xingyun.equipment.admin.modular.device.vo.ProjectLiftVO" extends="BaseResultMap" >
+        <result column="projectName" property="projectName"/>
+        <result column="createUserName" property="createUserName"/>
+    </resultMap>
+
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        project_id AS projectId,
+        identifier,
+        specification,
+        owner,
+        name,
+        manufactor,
+        max_weight AS maxWeight,
+        max_people AS maxPeople,
+        standard_height AS standardHeight,
+        speed,
+        is_online AS isOnline,
+        status, comments,
+        is_del AS isDel,
+        create_time AS createTime,
+        create_user AS createUser,
+        modify_time AS modifyTime,
+        modify_user AS modifyUser,
+        device_no as deviceNo,
+        org_id AS orgId
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+         ${alias}.id,
+         ${alias}.project_id AS projectId,
+         ${alias}.identifier,
+         ${alias}.specification,
+         ${alias}.owner,
+         ${alias}.name,
+         ${alias}.manufactor,
+         ${alias}.max_weight AS maxWeight,
+         ${alias}.max_people AS maxPeople,
+         ${alias}.standard_height AS standardHeight,
+         ${alias}.speed,
+         ${alias}.is_online AS isOnline,
+         ${alias}.status,
+         ${alias}.comments,
+         ${alias}.is_del AS isDel,
+         ${alias}.create_time AS createTime,
+         ${alias}.create_user AS createUser,
+         ${alias}.modify_time AS modifyTime,
+         ${alias}.modify_user AS modifyUser,
+         ${alias}.org_id AS orgId,
+         ${alias}.device_no AS deviceNo,
+         ${alias}.place_point AS placePoint
+    </sql>
+
+
+    <select id="selectPageList" resultMap="newResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include> ,
+--         ifnull((SELECT
+-- 		  IF (
+-- 			  (
+-- 				UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(tt.end_time)
+-- 			) > 45,
+-- 			'离线',
+-- 			'在线'
+-- 		)
+-- 		FROM
+-- 			t_project_lift_heartbeat tt
+-- 		where tt.device_no =a.device_no
+-- 		ORDER BY
+-- 			id DESC
+--         LIMIT 1),'离线') as statusName
+        if(a.is_online=1,"在线","离线") as statusName
+        ,b.name as projectName,n.name as createUserName
+        from t_project_lift a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_sys_user n on a.create_user = n.id
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+
+
+    <select id="selectListMap" resultMap="newResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+--         ,ifnull((SELECT
+-- 		  IF (
+-- 			  (
+-- 				UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(tt.end_time)
+-- 			) > 45,
+-- 			'离线',
+-- 			'在线'
+-- 		)
+-- 		FROM
+-- 			t_project_lift_heartbeat tt
+-- 		where tt.device_no =a.device_no
+-- 		ORDER BY
+-- 			id DESC
+--         LIMIT 1),'离线') as statusName
+        ,if(a.is_online=1,"在线","离线") as statusName
+        ,b.name as projectName,n.name as createUserName
+        from t_project_lift a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_sys_user n on a.create_user = n.id
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+
+    <insert id="insertProjectLift" useGeneratedKeys="true" keyProperty="id">
+        insert INTO  t_project_lift
+        (project_id,
+        device_no,
+        place_point,
+        gprs,
+        owner,
+        identifier,
+        specification,
+        manufactor,
+        max_weight,
+        standard_height,
+        max_people,
+        speed,
+        comments,
+        is_online,
+        create_time)
+        VALUES (
+        #{t.projectId},
+        #{t.deviceNo},
+        #{t.placePoint},
+        #{t.gprs},
+        #{t.owner},
+        #{t.identifier},
+        #{t.specification},
+        #{t.manufactor},
+        #{t.maxWeight},
+        #{t.standardHeight},
+        #{t.speed},
+        #{t.comments},
+        0,
+        now()
+        )
+    </insert>
+
+    <select id="selectByName" resultMap="BaseResultMap">
+        select
+        id,
+        project_id AS projectId,
+        identifier,
+        specification,
+        owner,
+        manufactor,
+        max_weight AS maxWeight,
+        max_people AS maxPeople,
+        standard_height AS standardHeight,
+        speed,
+        is_online AS isOnline,
+        status, comments,
+        is_del AS isDel,
+        create_time AS createTime,
+        create_user AS createUser,
+        modify_time AS modifyTime,
+        modify_user AS modifyUser,
+        org_id AS orgId
+        from t_project_lift
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+
+    <select id="checkByDeviceNo" resultMap="BaseResultMap">
+        SELECT
+        id,
+        device_no
+        from t_project_lift
+        where id!=#{id}
+        and is_del=0
+        and device_no=#{deviceNo}
+        and status=1
+    </select>
+
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.attendance.modular.command.dao.AttendanceRecordMapper">
+
+    <select id="getEntriesExitsQuantity" resultType="com.xywg.attendance.modular.led.model.EntriesExitsQuantityVo">
+        select
+        (select count(At_Type) from Attendance_Record where Project_Code =#{projectCode}
+        and CONVERT(varchar(100), Record, 23)=CONVERT(varchar(100), GETDATE(), 23) and At_Type =1) as incount,
+        (select count(At_Type) from Attendance_Record where Project_Code =#{projectCode}
+        and CONVERT(varchar(100), Record, 23)=CONVERT(varchar(100), GETDATE(), 23) and At_Type =0) as outcount
+    </select>
+
+    <select id="getAttendanceNumber" resultType="com.xywg.attendance.modular.led.model.AttendanceNumber">
+        select count(DISTINCT ID_NO) as attcount   from Attendance_Record
+         where Project_Code =#{projectCode}  and  CONVERT(varchar(100), Record, 23)=CONVERT(varchar(100), GETDATE(), 23)
+    </select>
+
+
+</mapper>

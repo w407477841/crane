@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.whf.dao.ProjectEnvironmentMonitorOriginalDataMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectEnvironmentMonitorOriginalData">
+        <id column="id" property="id" />
+        <result column="device_no" property="deviceNo" />
+        <result column="original_data" property="originalData" />
+        <result column="device_time" property="deviceTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, device_no AS deviceNo, original_data AS originalData, device_time AS deviceTime
+    </sql>
+
+</mapper>

@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.RealTimeMonitoringTowerMapper">
+    <select id="selectCrane" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        pc.id,pc.device_no AS deviceNo,pc.project_id AS projectId,pi.name AS projectName,pc.is_online AS status,pc.manufactor
+        FROM
+        t_project_crane pc
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        WHERE pc.is_del = 0 AND pc.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="key != null and key != ''">
+            AND pc.project_id = #{key}
+        </if>
+        <if test="status != null">
+            AND pc.is_online = #{status}
+        </if>
+        <if test="deviceNo != null">
+            AND pc.device_no like #{deviceNo}
+        </if>
+        ORDER BY pc.create_time DESC
+    </select>
+
+    <select id="selectCraneData" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        pcd.id,pcd.device_time AS deviceTime,pcd.range,pcd.height,pcd.weight,pcd.moment_percentage AS momentPercentage,pcd.driver,pcd.status
+        FROM
+        ${tableName} pcd
+        WHERE pcd.is_del = 0 AND pcd.crane_id = #{id}
+        <if test="key == '吊重'">
+            AND pcd.weight > 0
+        </if>
+        <if test="begin != null and begin != ''">
+            AND date_format(pcd.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(pcd.create_time,'%Y-%m-%d')
+        </if>
+        <if test="status == 1 or status == 0">
+            AND pcd.status = #{status}
+        </if>
+        <if test="percentage == 1">
+            AND 90 > pcd.moment_percentage
+        </if>
+        <if test="percentage == 2">
+            AND pcd.moment_percentage >= 90 AND 110 > pcd.moment_percentage
+        </if>
+        <if test="percentage == 3">
+            AND pcd.moment_percentage >= 110 AND 120 > pcd.moment_percentage
+        </if>
+        <if test="percentage == 4">
+            AND pcd.moment_percentage >= 120
+        </if>
+        ORDER BY pcd.device_time DESC
+    </select>
+
+    <select id="selectMonitorStatus" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        create_time AS deviceTimeBegin,ifnull(end_time,now())  AS deviceTimeEnd,status
+        FROM
+        t_project_crane_heartbeat
+        WHERE crane_id = #{craneId}
+        <if test="begin != null and begin != ''">
+            AND date_format(create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(create_time,'%Y-%m-%d')
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectRunTime" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        create_time AS deviceTimeBegin,end_time AS deviceTimeEnd
+        FROM
+        t_project_crane_heartbeat
+        WHERE crane_id = #{craneId}
+        <if test="begin != null and begin != ''">
+            AND date_format(create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(create_time,'%Y-%m-%d')
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectPromptingAlarm" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT *,(alarmWeight + alarmRange + alarmMoment + alarmCollision + alarmHeight) AS alarmAll FROM
+        (SELECT
+        COUNT(pca.id) AS alarmWeight,
+        <!-- 幅度预警 -->
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND (pca.alarm_id = 4 OR pca.alarm_id = 6) AND pca.crane_id = #{id}) AS alarmRange,
+        <!-- 力矩预警 -->
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND pca.alarm_id = 10 AND pca.crane_id = #{id}) AS alarmMoment,
+       <!-- 碰撞预警 -->
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND (pca.alarm_id = 12 OR pca.alarm_id = 14) AND pca.crane_id = #{id}) AS alarmCollision,
+        <!-- 高度预警 -->
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND (pca.alarm_id = 8 ) AND pca.crane_id = #{id}) AS alarmHeight
+        FROM
+        ${tableName} pca
+        WHERE pca.is_del = 0 AND pca.alarm_id = 2 AND pca.crane_id = #{id}
+        <if test="begin != null and begin != ''">
+            AND date_format(pca.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(pca.create_time,'%Y-%m-%d')
+        </if>) s
+    </select>
+
+    <select id="selectWarningAlarm" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT *,(alarmWeight + alarmRange + alarmMoment + alarmCollision + alarmSpeed + alarmTiltAngle+alarmHeight) AS alarmAll FROM (SELECT
+        COUNT(pca.id) AS alarmWeight,
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND (pca.alarm_id = 3 OR pca.alarm_id = 5) AND pca.crane_id = #{id}) AS alarmRange,
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND pca.alarm_id = 9 AND pca.crane_id = #{id}) AS alarmMoment,
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND (pca.alarm_id = 11 OR pca.alarm_id = 13) AND pca.crane_id = #{id}) AS alarmCollision,
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND pca.alarm_id = 15 AND pca.crane_id = #{id}) AS alarmSpeed,
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND pca.alarm_id = 7 AND pca.crane_id = #{id}) AS alarmHeight,
+        (SELECT COUNT(pca.id) FROM ${tableName} pca WHERE pca.is_del = 0 AND pca.alarm_id = 16 AND pca.crane_id = #{id}) AS alarmTiltAngle
+        FROM
+        ${tableName} pca
+        WHERE pca.is_del = 0 AND pca.alarm_id = 1 AND pca.crane_id = #{id}
+        <if test="begin != null and begin != ''">
+            AND date_format(pca.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(pca.create_time,'%Y-%m-%d')
+        </if>) s
+    </select>
+
+    <select id="selectViolationAlarm" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT alarmWeight FROM (SELECT
+        COUNT(pca.id) AS alarmWeight
+        FROM
+        ${tableName} pca
+        WHERE pca.is_del = 0 AND pca.alarm_id = 1 AND pca.crane_id = #{id}
+        <if test="begin != null and begin != ''">
+            AND date_format(pca.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(pca.create_time,'%Y-%m-%d')
+        </if>)s
+    </select>
+
+    <select id="selectAlarmData" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        pca.id,pca.alarm_info AS alarmInfo,pca.create_time AS alarmTime
+        FROM
+        ${tableName} pca
+        WHERE pca.is_del = 0 AND pca.crane_id = #{id}
+        <if test="key == '预警'">
+            AND pca.alarm_id IN (2,4,6,8,10,12,14)
+        </if>
+        <if test="key == '报警'">
+            AND pca.alarm_id IN (1,3,5,7,9,11,13,15,16)
+        </if>
+        <if test="key == '违章'">
+            AND pca.alarm_id = 1
+        </if>
+        <if test="begin != null and begin != ''">
+            AND date_format(pca.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(pca.create_time,'%Y-%m-%d')
+        </if>
+        ORDER BY pca.create_time DESC
+    </select>
+
+    <insert id="insertMessage" parameterType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        INSERT INTO
+        t_project_crane_message(model,title,send_time,content,related_user)
+        VALUES(#{model},#{title},date_format(now(),'%Y-%m-%d %H:%i:%s'),#{content},#{relatedUser})
+    </insert>
+
+    <select id="getCraneInfo" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        pc.id,pcd.device_no AS deviceNo,pc.identifier,pc.manufactor,pc.owner,pcd.weight,pcd.height,pcd.range,pcd.rotary_angle AS rotaryAngle,
+        pcd.moment,
+        if(pc.is_online=1,'在线','离线') as status,
+        pcd.device_time AS deviceTime
+        FROM
+        ${tableName} pcd
+        LEFT JOIN
+        t_project_crane pc
+        ON pcd.crane_id = pc.id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        WHERE pc.is_del = 0 AND pi.uuid = #{uuid} AND pc.device_no = #{deviceNo}
+        order by pcd.device_time desc
+    </select>
+
+    <select id="getAlarmInfo" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        pca.alarm_id AS alarmId,pi.name AS projectName,pc.device_no AS deviceNo,pca.alarm_info AS info,COUNT(pca.id) AS amount
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_crane pc
+        ON pc.id = pca.crane_id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        WHERE pca.is_del = 0 AND pi.uuid IN
+        <foreach collection="uuids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="deviceNo != null and deviceNo != ''">
+            AND pc.device_no = #{deviceNo}
+        </if>
+        <if test="alarmId != null and alarmId != ''">
+            AND pca.alarm_id = #{alarmId}
+        </if>
+        GROUP BY pc.device_no,pca.alarm_info
+    </select>
+
+    <select id="getAlarmDetail" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        pca.create_time AS deviceTime,pca.alarm_info AS info,CASE pca.status WHEN 1 THEN '已处理' ELSE '未处理' END AS status,pca.modify_time AS modifyTime,pca.modify_user_name AS userName
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_crane pc
+        ON pc.id = pca.crane_id
+        WHERE pca.is_del = 0 AND pca.alarm_id = #{alarmId} AND pc.device_no = #{deviceNo}
+        ORDER BY pca.create_time DESC 
+    </select>
+
+
+    <select id="getMonitorData" resultType="com.xywg.equipmentmonitor.core.vo.CurrentCraneDataVO">
+    select m.deviceNo,m.deviceTime,m.weight,m.height,m.rang,m.rotaryAngle,m.moment  ,m.status, crane.identifier,crane.manufactor,crane.owner  from (
+    <foreach collection="months"  item="month"  open="" close="" separator="UNION ALL" >
+        SELECT
+        device_no as deviceNo,
+        device_time as deviceTime,
+        weight as weight,
+        height as height,
+        `range` as rang,
+        rotary_angle  as rotaryAngle,
+        moment as moment,
+        '在线' as status,
+        crane_id craneId
+        FROM
+        t_project_crane_detail_${month}
+        where
+        <!--
+        device_time between  #{startTime} and #{endTime}
+        and-->
+        is_del = 0
+        and crane_id  = (
+        select id from  t_project_crane
+        where device_no = #{deviceNo}
+        and project_id  = (
+        select id from t_project_info where uuid = #{uuid}
+        )
+        )
+        order by device_time limit 1
+    </foreach>
+    ) m
+    left join
+    t_project_crane crane  on crane.id = m.craneId
+</select>
+
+    <select id="getRunTimeReal" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.RealTimeMonitoringTowerVo">
+        SELECT
+        pcd.device_time AS deviceTime,pcd.weight
+        FROM
+        ${tableName} pcd
+        WHERE crane_id = #{craneId} AND device_time > #{beginDate} AND #{endDate} > device_time
+    </select>
+</mapper>

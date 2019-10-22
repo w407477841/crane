@@ -1,0 +1,57 @@
+server:
+  port: 9066
+
+spring:
+  redis:
+      host: 192.168.1.24
+      port: 6379
+      password: suzhong@123
+      max-idle: 500
+      min-idle: 50
+      active: 2000
+      wait: 1000
+      cahce-names: xywg-sbgl-day-2,xywg-sbgl-min-30,xywg-sbgl-min-2,xywg-sbgl-hour-2
+
+  datasource:
+    url: jdbc:sqlserver://192.168.1.4:1433;DatabaseName=szlwgl_base;autocommit=on
+    username: sa
+    password: 88826141***@^!$!Szjs
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+#  rabbitmq:
+#      username: admin
+#      password: admin
+#      #virtualHost: XXX
+#      addresses: 192.168.1.199:5672
+#      publisher-confirms: true
+ #mongo配置
+#  data:
+#    mongodb:
+#      uri: mongodb://test:123456@192.168.1.211:27017/testDB
+
+#---------------------------  mybatis-plus配置  -------------------------
+mybatis-plus:
+  mapper-locations: classpath*:**/mapping/*.xml
+  typeAliasesPackage: com.xywg.attendance.modular
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+  #  metaObjectHandler: com.xywg.equipmentmonitor.core.aop.MyMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: false
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+
+#ftp:
+#  host: 192.168.1.209
+#  port: 22
+#  username: wangshibo
+#  password: 123456
+

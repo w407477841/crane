@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectEnvironmentMonitorVideoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.device.model.ProjectEnvironmentMonitorVideo">
+        <id column="id" property="id" />
+        <result column="monitor_id" property="monitorId" />
+        <result column="login_name" property="loginName" />
+        <result column="password" property="password" />
+        <result column="type" property="type" />
+        <result column="ip_address" property="ipAddress" />
+        <result column="port" property="port" />
+        <result column="platform_type" property="platformType" />
+        <result column="tunnel" property="tunnel" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="appkey" property="appkey" />
+        <result column="secret" property="secret" />
+        <result column="area" property="area" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, monitor_id AS monitorId,type, login_name AS loginName, password, ip_address AS ipAddress, port, platform_type AS platformType, tunnel, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId,appkey,
+        secret,
+        area
+    </sql>
+
+</mapper>

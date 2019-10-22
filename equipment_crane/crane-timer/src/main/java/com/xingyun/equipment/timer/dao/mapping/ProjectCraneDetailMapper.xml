@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.xingyun.equipment.timer.dao.ProjectCraneDetailMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.xingyun.equipment.timer.model.ProjectCraneDetail">
+		<id column="id" property="id" />
+		<result column="crane_id" property="craneId" />
+		<result column="device_no" property="deviceNo" />
+		<result column="driver" property="driver" />
+		<result column="device_time" property="deviceTime" />
+		<result column="status" property="status" />
+		<result column="weight" property="weight" />
+		<result column="moment" property="moment" />
+		<result column="height" property="height" />
+		<result column="range" property="range" />
+		<result column="moment_percentage" property="momentPercentage" />
+		<result column="rotary_angle" property="rotaryAngle" />
+		<result column="tilt_angle" property="tiltAngle" />
+		<result column="wind_speed" property="windSpeed" />
+		<result column="is_del" property="isDel" />
+		<result column="create_time" property="createTime" />
+		<result column="create_user" property="createUser" />
+		<result column="modify_time" property="modifyTime" />
+		<result column="modify_user" property="modifyUser" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, crane_id AS craneId, device_no AS deviceNo, driver, device_time AS
+		deviceTime, status, weight, moment, height, range, moment_percentage
+		AS momentPercentage, rotary_angle AS rotaryAngle, tilt_angle AS
+		tiltAngle, wind_speed AS windSpeed, is_del AS isDel, create_time AS
+		createTime, create_user AS createUser, modify_time AS modifyTime,
+		modify_user AS modifyUser
+	</sql>
+
+
+	<insert id="createDetail" useGeneratedKeys="true" keyProperty="t.id" >
+		insert into ${tableName} (
+		is_del,create_time
+		<if test="t.id!=null">
+			,id
+		</if>
+
+		<if test="t.craneId!=null">
+			,crane_id
+		</if>
+
+		<if test="t.deviceNo!=null">
+			,device_no
+		</if>
+
+		<if test="t.driver!=null">
+			,driver
+		</if>
+
+
+			,device_time
+
+
+
+			,status
+
+
+		<if test="t.weight!=null">
+			,`weight`
+		</if>
+
+		<if test="t.moment!=null">
+			,moment
+		</if>
+
+		<if test="t.height!=null">
+			,`height`
+		</if>
+
+		<if test="t.range!=null">
+			,`range`
+		</if>
+
+		<if test="t.momentPercentage!=null">
+			,moment_percentage
+		</if>
+
+		<if test="t.rotaryAngle!=null">
+			,rotary_angle
+		</if>
+
+		<if test="t.tiltAngle!=null">
+			,tilt_angle
+		</if>
+
+		<if test="t.windSpeed!=null">
+			,wind_speed
+		</if>
+
+		<if test="t.createUser!=null">
+			,create_user
+		</if>
+
+		<if test="t.modifyTime!=null">
+			,modify_time
+		</if>
+
+		<if test="t.modifyUser!=null">
+			,modify_user
+		</if>
+
+		)
+		values (
+		0,DATE_FORMAT(now(),'%Y-%m-%d %T')
+		<if test="t.id!=null">
+			,#{t.id}
+		</if>
+		<if test="t.craneId!=null">
+			,#{t.craneId}
+		</if>
+		<if test="t.deviceNo!=null">
+			,#{t.deviceNo}
+		</if>
+		<if test="t.driver!=null">
+			,#{t.driver}
+		</if>
+		,DATE_FORMAT(now(),'%Y-%m-%d %T')
+
+			,1
+
+		<if test="t.weight!=null">
+			,#{t.weight}
+		</if>
+		<if test="t.moment!=null">
+			,#{t.moment}
+		</if>
+		<if test="t.height!=null">
+			,#{t.height}
+		</if>
+		<if test="t.range!=null">
+			,#{t.range}
+		</if>
+		<if test="t.momentPercentage!=null">
+			,#{t.momentPercentage}
+		</if>
+		<if test="t.rotaryAngle!=null">
+			,#{t.rotaryAngle}
+		</if>
+		<if test="t.tiltAngle!=null">
+			,#{t.tiltAngle}
+		</if>
+		<if test="t.windSpeed!=null">
+			,#{t.windSpeed}
+		</if>
+		<if test="t.createUser!=null">
+			,#{t.createUser}
+		</if>
+		<if test="t.modifyTime!=null">
+			,#{t.modifyTime}
+		</if>
+		<if test="t.modifyUser!=null">
+			,#{t.modifyUser}
+		</if>
+		)
+	</insert>
+
+</mapper>

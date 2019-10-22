@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.ammeter.dao.ProjectAmmeterDailyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.ammeter.model.ProjectAmmeterDaily">
+        <id column="id" property="id" />
+        <result column="device_id" property="deviceId" />
+        <result column="statistics_date" property="statisticsDate" />
+        <result column="degree" property="degree" />
+        <result column="amount_used" property="amountUsed" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, device_id AS deviceId, statistics_date AS statisticsDate, degree, amount_used AS amountUsed
+    </sql>
+
+
+    <select id="last" resultType="java.util.Map">
+SELECT
+	device.id,
+	device_no AS deviceNo,
+	daily.degree,
+	last.degree lastDegree,
+	last.amount_used amountUsed
+FROM
+	( SELECT device_no, id FROM t_project_electric_power WHERE is_del = 0 ) device
+	LEFT JOIN (
+	SELECT
+		electric_id,
+		max( actual_degree ) degree
+	FROM
+		t_project_electric_power_detail_${month}
+	WHERE
+		electric_id IN ( SELECT id FROM t_project_electric_power WHERE is_del = 0 )
+		AND DATE_FORMAT(device_time, '%Y-%m-%d') LIKE '${daily}%'
+	GROUP BY
+		electric_id
+	) daily ON device.id = daily.electric_id
+	LEFT JOIN ( SELECT device_id, degree, amount_used FROM t_project_ammeter_daily WHERE t_project_ammeter_daily.statistics_date = '${daily1}' ) last ON device.id = last.device_id
+
+    </select>
+
+	<select id="lastDevice" resultType="java.util.Map">
+		SELECT
+		device.id,
+		device_no AS deviceNo,
+		daily.degree,
+		last.degree lastDegree,
+		last.amount_used amountUsed
+		FROM
+		( SELECT device_no, id FROM t_project_electric_power WHERE is_del = 0 AND id = #{deviceId}) device
+		LEFT JOIN (
+		SELECT
+		electric_id,
+		max( actual_degree ) degree
+		FROM
+		t_project_electric_power_detail_${month}
+		WHERE
+		electric_id IN ( SELECT id FROM t_project_electric_power WHERE is_del = 0 )
+		AND DATE_FORMAT(device_time, '%Y-%m-%d') LIKE '${daily}%'
+		GROUP BY
+		electric_id
+		) daily ON device.id = daily.electric_id
+		LEFT JOIN ( SELECT device_id, degree, amount_used FROM t_project_ammeter_daily WHERE t_project_ammeter_daily.statistics_date = '${daily1}' ) last ON device.id = last.device_id
+	</select>
+</mapper>

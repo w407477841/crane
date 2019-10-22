@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.xingyun.equipment.admin.modular.remotesetting.dao.ProjectCraneCalibrationLogMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.xingyun.equipment.admin.modular.remotesetting.model.ProjectCraneCalibrationLog">
+		<id column="id" property="id" />
+		<result column="device_no" property="deviceNo" />
+		<result column="command" property="command" />
+		<result column="project_id" property="projectId" />
+		<result column="content" property="content" />
+		<result column="is_del" property="isDel" />
+		<result column="create_time" property="createTime" />
+		<result column="create_user" property="createUser" />
+		<result column="modify_time" property="modifyTime" />
+		<result column="modify_user" property="modifyUser" />
+	</resultMap>
+
+
+
+</mapper>

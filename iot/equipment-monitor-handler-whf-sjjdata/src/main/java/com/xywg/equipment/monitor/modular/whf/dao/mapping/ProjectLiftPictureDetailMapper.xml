@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.whf.dao.ProjectLiftPictureDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectLiftPictureDetail">
+        <id column="id" property="id" />
+        <result column="device_no" property="deviceNo" />
+        <result column="url" property="url" />
+        <result column="lift_id" property="liftId" />
+        <result column="device_time" property="deviceTime" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, device_no AS deviceNo, url, device_time AS deviceTime, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+
+    <insert id="insertImg" useGeneratedKeys="true" keyProperty="t.id" >
+        insert into t_project_lift_picture_detail_${month} (
+        is_del,create_time
+        <if test="t.id!=null">
+            ,id
+        </if>
+
+        <if test="t.liftId!=null">
+            ,lift_id
+        </if>
+
+        <if test="t.deviceNo!=null">
+            ,device_no
+        </if>
+        ,device_time
+        <if test="t.url!=null">
+            ,url
+        </if>
+        <if test="t.createUser!=null">
+            ,create_user
+        </if>
+
+        <if test="t.modifyTime!=null">
+            ,modify_time
+        </if>
+
+        <if test="t.modifyUser!=null">
+            ,modify_user
+        </if>
+
+        )
+        values (
+        0,DATE_FORMAT(#{t.createTime},'%Y-%m-%d %T')
+        <if test="t.id!=null">
+            ,#{t.id}
+        </if>
+        <if test="t.liftId!=null">
+            ,#{t.liftId}
+        </if>
+        <if test="t.deviceNo!=null">
+            ,#{t.deviceNo}
+        </if>
+        ,DATE_FORMAT(#{t.deviceTime},'%Y-%m-%d %T')
+        <if test="t.url!=null">
+            ,#{t.url}
+        </if>
+        <if test="t.createUser!=null">
+            ,#{t.createUser}
+        </if>
+        <if test="t.modifyTime!=null">
+            ,#{t.modifyTime}
+        </if>
+        <if test="t.modifyUser!=null">
+            ,#{t.modifyUser}
+        </if>
+        )
+    </insert>
+
+</mapper>

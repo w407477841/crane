@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.timer.dao.ProjectCraneStatisticsDailyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.timer.model.ProjectCraneStatisticsDaily">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="project_name" property="projectName" />
+        <result column="builder" property="builder" />
+        <result column="owner" property="owner" />
+        <result column="identifier" property="identifier" />
+        <result column="crane_no" property="craneNo" />
+        <result column="device_no" property="deviceNo" />
+        <result column="lift_frequency" property="liftFrequency" />
+        <result column="weight_warn" property="weightWarn" />
+        <result column="range_warn" property="rangeWarn" />
+        <result column="limit_warn" property="limitWarn" />
+        <result column="moment_warn" property="momentWarn" />
+        <result column="collision_warn" property="collisionWarn" />
+        <result column="weight_alarm" property="weightAlarm" />
+        <result column="range_alarm" property="rangeAlarm" />
+        <result column="limit_alarm" property="limitAlarm" />
+        <result column="moment_alarm" property="momentAlarm" />
+        <result column="collision_alarm" property="collisionAlarm" />
+        <result column="wind_speed_alarm" property="windSpeedAlarm" />
+        <result column="tilt_alarm" property="tiltAlarm" />
+        <result column="work_date" property="workDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, project_name AS projectName, builder, owner, identifier, crane_no AS craneNo, device_no AS deviceNo, lift_frequency AS liftFrequency, weight_warn AS weightWarn, range_warn AS rangeWarn, limit_warn AS limitWarn, moment_warn AS momentWarn, collision_warn AS collisionWarn, weight_alarm AS weightAlarm, range_alarm AS rangeAlarm, limit_alarm AS limitAlarm, moment_alarm AS momentAlarm, collision_alarm AS collisionAlarm, wind_speed_alarm AS windSpeedAlarm, tilt_alarm AS tiltAlarm, work_date AS workDate
+    </sql>
+
+</mapper>

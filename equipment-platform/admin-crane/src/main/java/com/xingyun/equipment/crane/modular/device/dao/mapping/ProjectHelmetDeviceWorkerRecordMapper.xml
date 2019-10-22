@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectHelmetDeviceWorkerRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.device.model.ProjectHelmetDeviceWorkerRecord">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="device_id" property="deviceId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="id_card_type" property="idCardType" />
+        <result column="id_card_number" property="idCardNumber" />
+        <result column="name" property="name" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, device_id AS deviceId, device_no as deviceNo,name,
+        id_card_type AS idCardType, id_card_number AS idCardNumber,
+        comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+
+</mapper>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.infromation.dao.ProjectTargetSetCraneMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.infromation.model.ProjectTargetSetCrane">
+        <id column="id" property="id" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="max_range" property="maxRange" />
+        <result column="max_weight" property="maxWeight" />
+        <result column="standard_height" property="standardHeight" />
+        <result column="fix_moment" property="fixMoment" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="comments" property="comments" />
+        <result column="org_id" property="orgId" />
+    	<result column="is_del" property="isDel" />
+    	<result column="create_time" property="createTime" />
+    	<result column="create_user" property="createUser" />
+    	<result column="modify_time" property="modifyTime" />
+    	<result column="modify_user" property="modifyUser" />
+        <result column="call_times" property="callTimes" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        specification,
+        manufactor,
+        max_range,
+        max_weight,
+        standard_height,
+        fix_moment,
+        wind_speed,
+        tilt_angle,
+        comments,
+        org_id,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+        call_times
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.specification AS ${alias}_specification,
+        ${alias}.manufactor AS ${alias}_manufactor,
+        ${alias}.max_range AS ${alias}_max_range,
+        ${alias}.max_weight AS ${alias}_max_weight,
+        ${alias}.standard_height AS ${alias}_standard_height,
+        ${alias}.fix_moment AS ${alias}_fix_moment,
+        ${alias}.wind_speed AS ${alias}_wind_speed,
+        ${alias}.tilt_angle AS ${alias}_tilt_angle,
+        ${alias}.comments AS ${alias}_comments,
+        ${alias}.org_id AS ${alias}_org_id,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+        ${alias}.call_times AS ${alias}call_times,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.specification,
+        ${alias}.manufactor,
+        ${alias}.max_range,
+        ${alias}.max_weight,
+        ${alias}.standard_height,
+        ${alias}.fix_moment,
+        ${alias}.wind_speed,
+        ${alias}.tilt_angle,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+        ${alias}.call_times
+    </sql>
+
+    <!--条件分页查询-->
+    <select id="selectPageList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Column_List">
+            <property name="alias" value="a" />
+        </include>
+        from t_project_target_set_crane a
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.id desc
+    </select>
+
+    <!--判重-->
+    <select id="checkBySpecificationAndManufactor" resultType="int">
+        select
+        count(*)
+        from t_project_target_set_crane
+        where specification=#{t.body.specification}
+        and manufactor=#{t.body.manufactor}
+        <if test="t.body.id!=null and t.body.id!=''">
+            and id!=#{t.body.id}
+        </if>
+    </select>
+</mapper>

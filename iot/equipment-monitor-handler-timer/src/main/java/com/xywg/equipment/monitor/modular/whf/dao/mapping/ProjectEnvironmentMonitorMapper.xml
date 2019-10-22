@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.whf.dao.ProjectEnvironmentMonitorMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectEnvironmentMonitor">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="manufactor" property="manufactor" />
+        <result column="region" property="region" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, device_no AS deviceNo, manufactor, region, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+    <select id="deviceStatus" resultType="com.xywg.equipment.monitor.modular.whf.dto.DeviceStatusVO">
+
+
+SELECT
+	id,
+	uuid,
+	liftAmount,
+	liftOff,
+	(liftAmount - liftOff) liftOn,
+   craneAmount,
+	 craneOff,
+ (craneAmount-craneOff) craneOn,
+	 monitorAmount,
+	 monitorOff ,
+	  (monitorAmount-monitorOff) monitorOn
+
+FROM
+	(
+		SELECT
+			p.id,
+			p.uuid,
+			IFNULL(lift1.amount, 0) liftAmount,
+			IFNULL(lift2.amount, 0) liftOff,
+			IFNULL(crane1.amount, 0) craneAmount,
+			IFNULL(crane2.amount, 0) craneOff,
+			IFNULL(monitor1.amount, 0) monitorAmount,
+			IFNULL(monitor2.amount, 0) monitorOff
+		FROM
+			t_project_info p
+		LEFT JOIN (
+			SELECT
+				project_id,
+				count(1) amount
+			FROM
+				t_project_lift
+			WHERE
+				is_del = 0
+			GROUP BY
+				project_id
+		) lift1 ON p.id = lift1.project_id
+		LEFT JOIN (
+			SELECT
+				project_id,
+				count(1) amount
+			FROM
+				t_project_lift
+			WHERE
+				is_del = 0
+			AND is_online = 0
+			GROUP BY
+				project_id
+		) lift2 ON p.id = lift2.project_id
+		LEFT JOIN (
+			SELECT
+				project_id,
+				count(1) amount
+			FROM
+				t_project_crane
+			WHERE
+				is_del = 0
+			GROUP BY
+				project_id
+		) crane1 ON p.id = crane1.project_id
+		LEFT JOIN (
+			SELECT
+				project_id,
+				count(1) amount
+			FROM
+				t_project_crane
+			WHERE
+				is_del = 0
+			AND is_online = 0
+			GROUP BY
+				project_id
+		) crane2 ON p.id = crane2.project_id
+		LEFT JOIN (
+			SELECT
+				project_id,
+				count(1) amount
+			FROM
+				t_project_environment_monitor
+			WHERE
+				is_del = 0
+			GROUP BY
+				project_id
+		) monitor1 ON p.id = monitor1.project_id
+		LEFT JOIN (
+			SELECT
+				project_id,
+				count(1) amount
+			FROM
+				t_project_environment_monitor
+			WHERE
+				is_del = 0
+			AND is_online = 0
+			GROUP BY
+				project_id
+		) monitor2 ON p.id = monitor2.project_id
+		WHERE
+			is_del = 0
+	) alias
+
+    </select>
+
+</mapper>

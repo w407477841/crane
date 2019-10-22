@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xingyun.equipment.admin.modular.common.dao.RecursiveMapper">
+	<select id="query" parameterType="com.xingyun.equipment.admin.modular.common.model.RecursiveCondition" resultType="java.lang.Integer" statementType="STATEMENT">
+		SELECT id
+		FROM ${tableName}
+		where ${pName}=${pId}
+		<if test="isDel!=null">
+			and is_del=0
+		</if>
+	</select>
+	
+	<update id="delete" parameterType="com.xingyun.equipment.admin.modular.common.model.RecursiveCondition" statementType="STATEMENT">
+		update ${tableName} set is_del=1
+		<where>
+			id in 
+			<foreach collection="ids" item="id" separator="," open="(" close=")">
+				${id}
+			</foreach>
+		</where>
+	</update>
+
+</mapper>

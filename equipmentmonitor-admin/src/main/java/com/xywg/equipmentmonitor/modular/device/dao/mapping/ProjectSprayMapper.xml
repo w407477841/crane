@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectSprayMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectLiftVO">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="maxWeight" property="maxWeight" />
+        <result column="maxPeople" property="maxPeople" />
+        <result column="standardHeight" property="standardHeight" />
+        <result column="speed" property="speed" />
+        <result column="isOnline" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="createTime" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="deviceNo" property="deviceNo" />
+        <result column="placePoint" property="placePoint" />
+    </resultMap>
+
+    <resultMap id ="newResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectLiftVO" extends="BaseResultMap" >
+        <result column="projectName" property="projectName"/>
+        <result column="createUserName" property="createUserName"/>
+    </resultMap>
+
+
+    <select id="getPageList" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectSprayVO">
+        select
+        s.id as id,
+        i.name as projectName,
+        s.device_no as deviceNo,
+        s.project_id as projectId,
+        s.gprs as gprs,
+        s.status,
+        s.is_online as isOnline,
+        s.identifier as identifier,
+        s.specification as specification,
+        s.owner as owner,
+        s.manufactor as manufactor,
+        if(s.is_online=1,'在线',"离线") as onlineName,
+        if(s.status=1,'开启','关闭') as statusName,
+        s.place_point as placePoint,
+        s.comments as comments,
+        s.is_del as isDel,
+        s.create_time as createTime,
+        u.name as createUserName,
+        s.name as name
+        from t_project_spray s
+        left join t_project_info i on i.id=s.project_id
+        left join t_sys_user u on u.id=s.create_user
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+
+    <select id="getById" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectSprayVO">
+        select
+        s.id as id,
+        i.name as projectName,
+        s.device_no as deviceNo,
+        s.project_id as projectId,
+        s.gprs as gprs,
+        s.identifier as identifier,
+        s.specification as specification,
+        s.owner as owner,
+        s.manufactor as manufactor,
+        if(s.is_online=1,'在线',"离线") as onlineName,
+        if(s.status=1,'开启','关闭') as statusName,
+        s.place_point as placePoint,
+        s.comments as comments,
+        s.is_del as isDel,
+        s.create_time as createTime,
+        u.name as createUserName,
+        s.name as name,
+        s.pm10 as pm10,s.pm25 as pm25
+        from t_project_spray s
+        left join t_project_info i on i.id=s.project_id
+        left join t_sys_user u on u.id=s.create_user
+        where s.is_del=0
+        and s.id=#{id}
+    </select>
+
+    <select id="checkByDeviceNo" resultType="int">
+        select
+        count(id)
+        from t_project_spray
+        where is_del=0
+        <if test="r.id!=null and r.id!=''">
+            and id!=#{r.id}
+        </if>
+        and device_no=#{r.deviceNo}
+    </select>
+
+    <select id="getSpraysByEnvironDevice"  resultType="com.xywg.equipmentmonitor.modular.device.vo.SpraysStatusVO">
+        select device_no  as deviceNo,identifier,status as status,is_online as isOnline
+        from t_project_spray
+        where is_del=0 and id in (select spray_id from t_project_spray_bind where environment_id =(select id from t_project_environment_monitor where device_no=#{deviceNo}))
+    </select>
+
+</mapper>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.envmon.dao.ProjectEnvironmentMonitorAlarmMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.envmon.model.ProjectEnvironmentMonitorAlarm">
+        <id column="id" property="id" />
+        <result column="monitor_id" property="monitorId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="alarm_info" property="alarmInfo" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, monitor_id AS monitorId, device_no AS deviceNo, alarm_info AS alarmInfo, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <insert id="createAlarm" useGeneratedKeys="true" keyProperty="t.id" >
+        insert into ${tableName} (
+        is_del,create_time,`status`
+        <if test="t.id!=null">
+            ,id
+        </if>
+        <if test="t.alarmId!=null">
+            ,alarm_id
+        </if>
+
+        <if test="t.monitorId!=null">
+            ,monitor_id
+        </if>
+        <if test="t.detailId!=null">
+            ,detail_id
+        </if>
+
+        <if test="t.deviceNo!=null">
+            ,device_no
+        </if>
+
+        <if test="t.alarmInfo!=null">
+            ,alarm_info
+        </if>
+
+        <if test="t.createUser!=null">
+            ,create_user
+        </if>
+
+        <if test="t.modifyTime!=null">
+            ,modify_time
+        </if>
+
+        <if test="t.modifyUser!=null">
+            ,modify_user
+        </if>
+
+        )
+        values (
+        0,DATE_FORMAT(now(),'%Y-%m-%d %T'),0
+        <if test="t.id!=null">
+            ,#{t.id}
+        </if>
+        <if test="t.alarmId!=null">
+            ,#{t.alarmId}
+        </if>
+        <if test="t.monitorId!=null">
+            ,#{t.monitorId}
+        </if>
+        <if test="t.detailId!=null">
+            ,#{t.detailId}
+        </if>
+        <if test="t.deviceNo!=null">
+            ,#{t.deviceNo}
+        </if>
+        <if test="t.alarmInfo!=null">
+            ,#{t.alarmInfo}
+        </if>
+        <if test="t.createUser!=null">
+            ,#{t.createUser}
+        </if>
+        <if test="t.modifyTime!=null">
+            ,#{t.modifyTime}
+        </if>
+        <if test="t.modifyUser!=null">
+            ,#{t.modifyUser}
+        </if>
+        )
+    </insert>
+
+</mapper>

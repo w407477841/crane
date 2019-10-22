@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectMessageLiftMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectMessageLift">
+        <id column="id" property="id" />
+        <result column="model" property="model" />
+        <result column="title" property="title" />
+        <result column="send_time" property="sendTime" />
+        <result column="content" property="content" />
+        <result column="related_user" property="relatedUser" />
+        <result column="org_id" property="orgId" />
+    	<result column="is_del" property="isDel" />
+    	<result column="create_time" property="createTime" />
+    	<result column="create_user" property="createUser" />
+    	<result column="modify_time" property="modifyTime" />
+    	<result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        model,
+        title,
+        send_time,
+        content,
+        related_user,
+        org_id,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.model AS ${alias}_model,
+        ${alias}.title AS ${alias}_title,
+        ${alias}.send_time AS ${alias}_send_time,
+        ${alias}.content AS ${alias}_content,
+        ${alias}.related_user AS ${alias}_related_user,
+        ${alias}.org_id AS ${alias}_org_id,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.model,
+        ${alias}.title,
+        ${alias}.send_time,
+        ${alias}.content,
+        ${alias}.related_user,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+    </sql>
+</mapper>

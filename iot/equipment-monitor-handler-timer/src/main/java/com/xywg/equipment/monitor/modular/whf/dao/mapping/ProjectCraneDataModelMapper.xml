@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.whf.dao.ProjectCraneDataModelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectCraneDataModel">
+        <id column="id" property="id" />
+        <result column="weight" property="weight" />
+        <result column="moment" property="moment" />
+        <result column="moment_percentage" property="momentPercentage" />
+        <result column="height" property="height" />
+        <result column="rang" property="rang" />
+        <result column="rotary_angle" property="rotaryAngle" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="flag" property="flag" />
+        <result column="device_no" property="deviceNo" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, weight, moment, moment_percentage AS momentPercentage, height, rang, rotary_angle AS rotaryAngle, wind_speed AS windSpeed, tilt_angle AS tiltAngle, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, flag, device_no AS deviceNo
+    </sql>
+
+</mapper>

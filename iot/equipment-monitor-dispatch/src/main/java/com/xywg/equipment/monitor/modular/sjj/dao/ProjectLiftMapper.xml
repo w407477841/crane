@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.sjj.dao.ProjectLiftMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.sjj.model.ProjectLift">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="max_weight" property="maxWeight" />
+        <result column="max_people" property="maxPeople" />
+        <result column="standard_height" property="standardHeight" />
+        <result column="speed" property="speed" />
+        <result column="is_online" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, identifier, specification, owner, manufactor, max_weight AS maxWeight, max_people AS maxPeople, standard_height AS standardHeight, speed, is_online AS isOnline, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+
+    <select id="selectDeviceNoOfNeedDispatch" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select
+            device_no
+        from t_project_lift
+        where is_del=0 and need_dispatch=#{dispatch}
+    </select>
+
+</mapper>

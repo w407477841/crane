@@ -1,0 +1,18 @@
+1.打包:
+    无论是打jar 包还是war 只需修改pom.xml 中的<packaging> 标签值即可,无须修改pom文件中其他
+2.日志:
+    如果对日志存储路径有特殊要求的,需要修改logback-spring.xml 配置
+3.配置:
+    a:  application-dev.yml为开发时配置文件,application-produce.yml 为正式使用时的配置文件,
+    打包之前应该修改application.properties 中的值,以达到切换配置文件的目的
+    b:  配置文件根据需求修改相应监听端口, 更改数据通信中的私钥密码 等配置
+    c:  GlobalStaticConstant 文件中指定了mq 队列中的topic 和redis 存储key  需要根据实际环境修改
+    d:  ZKCryptoClientService 需要读取的密码库文件路径在application.properties 设置
+
+4.特别注意:
+        a:  ZKCryptoClientService 类的包路径严禁修改,一但修改将导致无法加载密码库
+        b:  ZKCryptoClientService 中System.load 的地址需要根据实际发布时情况修改文件路径,
+            应当将dll_or_os中的相应文件拷贝到相应路径,以达到加载C语言的密码库
+
+        c:  设备初始化,交换公钥,交换因子 请求为明文交互,其他所有交互为密文交互
+

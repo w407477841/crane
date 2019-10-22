@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectEnvironmentMonitorHeartbeatMapper">
+
+    <select id="selectPageList" resultType="com.xingyun.equipment.admin.modular.device.model.ProjectEnvironmentHeartbeat">
+        select
+        <include refid="Base_Column_List" />
+        from t_project_environment_heartbeat
+        where monitor_id = #{ew.monitorId}
+        <if test="ew.beginTime !=null and ew.beginTime !='' ">
+            and create_time >= #{ew.beginTime}
+        </if>
+        <if test="ew.endTime !=null and ew.endTime !='' ">
+            and create_time &lt;= #{ew.endTime}
+        </if>
+        order by create_time desc
+    </select>
+
+
+
+    <sql id="Base_Column_List">
+        id,monitor_id as monitorId,device_no as deviceNo,
+        status,
+        timestampdiff(second,create_time,ifnull(end_time,now())) as duration,
+        DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') as createTimeStr,
+        DATE_FORMAT(end_time, '%Y-%m-%d %H:%i:%s') as endTime
+    </sql>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.station.dao.ProjectAccuratePositionDataMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.station.model.ProjectAccuratePositionData">
+        <id column="id" property="id" />
+        <result column="map_id" property="mapId" />
+        <result column="x_zhou" property="xZhou" />
+        <result column="y_zhou" property="yZhou" />
+        <result column="collect_time" property="collectTime" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="lable_no" property="lableNo" />
+        <result column="identity_code" property="identityCode" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, map_id AS mapId, x_zhou AS xZhou, y_zhou AS yZhou, collect_time AS collectTime, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, lable_no AS lableNo, identity_code AS identityCode
+    </sql>
+
+</mapper>

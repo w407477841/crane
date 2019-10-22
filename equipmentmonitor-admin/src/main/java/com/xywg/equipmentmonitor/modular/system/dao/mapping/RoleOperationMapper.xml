@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.system.dao.RoleOperationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.system.model.RoleOperation">
+        <id column="id" property="id" />
+        <result column="role_id" property="roleId" />
+        <result column="oper_id" property="operId" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, role_id AS roleId, oper_id AS operId, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <select id="selectRoleOwnedOperation" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.system.model.RoleOperation">
+        SELECT
+        id,role_id AS roleId,oper_id AS operId
+        FROM
+        t_sys_role_operation
+        WHERE is_del = 0 AND role_id = #{roleId} AND oper_id NOT IN (SELECT parent_id FROM t_sys_operation)
+    </select>
+</mapper>

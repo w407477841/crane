@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.baseinfo.dao.MasterDeviceTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.baseinfo.model.MasterDeviceType">
+        <result column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, comments, is_del AS isDel, create_user AS createUser, create_time AS createTime, modify_user AS modifyUser, modify_time AS modifyTime
+    </sql>
+
+    <select id="selectDeviceTypeInfo" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.baseinfo.model.MasterDeviceType">
+        SELECT
+        mdt.id,mdt.name,mdt.comments,mdt.call_times AS callTimes,mdt.create_time AS createTime,mdt.create_user AS createUser,u.name AS createUserName
+        FROM
+        t_project_master_device_type mdt
+        LEFT JOIN
+        t_sys_user u
+        ON u.id = mdt.create_user
+        WHERE mdt.is_del = 0
+        ORDER BY mdt.create_time DESC
+    </select>
+
+    <select id="getDeviceTypeByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        t_project_master_device_type
+        WHERE is_del = 0 AND name = #{name}
+        <if test="id != null and id != ''">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="selectDeviceType" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        t_project_master_device_type
+        WHERE is_del = 0
+    </select>
+</mapper>

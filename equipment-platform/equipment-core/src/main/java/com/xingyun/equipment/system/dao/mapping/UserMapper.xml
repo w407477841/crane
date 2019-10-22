@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.system.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.system.model.User">
+        <id column="id" property="id" />
+        <result column="org_id" property="orgId" />
+        <result column="code" property="code" />
+        <result column="phone" property="phone" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="flag" property="flag" />
+        <result column="relation_user_id" property="relationUserId" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, org_id AS orgId, code, phone, name, password, flag, relation_user_id AS relationUserId, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <select id="selectUserInfo" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.vo.UserVo">
+        SELECT
+        u.id,u.org_id AS orgId,u.code,u.phone,u.name,u.comments,u.create_time AS createTime,uu.name AS createUserName,u.vender
+        FROM
+        t_sys_user u
+        LEFT JOIN
+        t_sys_user uu
+        ON uu.id = u.create_user
+        WHERE u.is_del = 0 AND u.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="key != null and key != ''">
+            AND u.name LIKE concat('%',#{key},'%')
+        </if>
+        ORDER BY u.create_time DESC
+    </select>
+
+    <select id="selectUserByOrgId" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.model.User">
+        SELECT
+        ou.id,u.name,u.phone,u.code
+        FROM
+        t_sys_user u
+        LEFT JOIN
+        t_sys_organization_user ou
+        ON ou.user_id = u.id
+        LEFT JOIN
+        t_sys_organization o
+        ON o.id = ou.org_id
+        WHERE u.is_del = 0 AND ou.is_del = 0 AND o.is_del = 0 AND o.id = #{id}
+        <if test="key != null and key != ''">
+            AND u.name LIKE concat('%',#{key},'%')
+        </if>
+    </select>
+
+    <select id="selectUserNotInOrg" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.model.User">
+        SELECT
+        u.id,u.org_id AS orgId,u.code,u.phone,u.name,u.comments,u.create_time AS createTime
+        FROM
+        t_sys_user u
+        WHERE u.is_del = 0 AND u.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        AND u.id NOT IN (SELECT u.id FROM t_sys_user u LEFT JOIN t_sys_organization_user ou ON u.id = ou.user_id WHERE u.is_del = 0 AND ou.org_id = #{orgId} AND ou.is_del = 0)
+        <if test="key != null and key != ''">
+            AND u.name LIKE concat('%',#{key},'%')
+        </if>
+        ORDER BY u.create_time DESC
+    </select>
+
+    <select id="selectUserById" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.vo.UserVo">
+        SELECT
+        u.id,u.org_id AS orgId,u.code,u.phone,u.name,u.comments,u.create_time AS createTime,u.vender
+        FROM
+        t_sys_user u
+        WHERE u.is_del = 0 AND u.id = #{id}
+    </select>
+
+    <select id="checkUser" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.model.User">
+        SELECT
+        *
+        FROM
+        t_sys_user
+        WHERE is_del = 0 AND code = #{code}
+        <if test="id != null and id != ''">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="checkPhone" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.model.User">
+        SELECT
+        *
+        FROM
+        t_sys_user
+        WHERE is_del = 0 AND phone = #{phone}
+        <if test="id != null and id != ''">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <update id="changePWD" parameterType="java.util.Map">
+        UPDATE
+        t_sys_user
+        SET password = #{password}
+        WHERE code = #{code}
+    </update>
+
+
+    <select id="getListUserByIds" resultType="com.xingyun.equipment.system.model.User">
+        select <include refid="Base_Column_List"/>
+        from t_sys_user where is_del=0
+        and id in(
+        <foreach collection="ids" index="index" item="item" close="" open="" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+</mapper>

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectEnvironmentMonitorAlarmMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.device.model.ProjectEnvironmentMonitorAlarm">
+        <id column="id" property="id"/>
+        <result column="monitor_id" property="monitorId"/>
+        <result column="alarm_id" property="alarmId"/>
+        <result column="device_no" property="deviceNo"/>
+        <result column="alarm_info" property="alarmInfo"/>
+        <result column="is_del" property="isDel"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="modify_user" property="modifyUser"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, monitor_id AS monitorId,alarm_id as alarmId, device_no AS deviceNo, alarm_info AS alarmInfo, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <select id="selectPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_project_environment_monitor_alarm a
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="getAlarmByDateTime"
+            resultType="com.xingyun.equipment.crane.modular.device.model.ProjectEnvironmentMonitorAlarm">
+        select * from (
+        <foreach collection="alarm.months" item="month" open="" close="" separator="UNION ALL">
+            select
+            <include refid="Base_Column_List"/>
+            from t_project_environment_monitor_alarm_${month}
+            where is_del=0
+            <if test="alarm.monitorId!=null  ">
+                and monitor_id = #{alarm.monitorId}
+            </if>
+            <if test="alarm.beginTime!=null and  alarm.beginTime!=''">
+                and create_time >= #{alarm.beginTime}
+            </if>
+            <if test="alarm.endTime!=null and  alarm.endTime!='' ">
+                and create_time &lt;= #{alarm.endTime}
+            </if>
+        </foreach>
+        ) m
+        order by createTime desc
+    </select>
+
+
+    <select id="getPageAlarmByDateTime"
+            resultType="com.xingyun.equipment.crane.modular.device.model.ProjectEnvironmentMonitorAlarm">
+        select * from (
+        <foreach collection="alarm.months" item="month" open="" close="" separator="UNION ALL">
+            select
+            date_format(create_time, '%Y-%m-%d %H:%i:%s') as alarmTime,
+            <include refid="Base_Column_List"/>
+            from t_project_environment_monitor_alarm_${month}
+            where is_del=0
+            <if test="alarm.monitorId!=null  ">
+                and monitor_id = #{alarm.monitorId}
+            </if>
+            <if test="alarm.beginTime!=null and  alarm.beginTime!=''">
+                and create_time >= #{alarm.beginTime}
+            </if>
+            <if test="alarm.endTime!=null and  alarm.endTime!='' ">
+                and create_time &lt;= #{alarm.endTime}
+            </if>
+        </foreach>
+        ) m
+        order by createTime desc
+    </select>
+
+    <update id="updateAlarm">
+
+        update ${tableName} set status = 1 ,
+        modify_user = #{userId},
+        modify_user_name = #{userName},
+        modify_time = DATE_FORMAT(now(),'%Y-%m-%d %T')
+
+        where id = #{id} and status = 0
+
+    </update>
+
+    <select id="selectDeviceUUID" resultType="com.xingyun.equipment.crane.modular.device.vo.DeviceUUIDVO" >
+
+        select id, device_no as deviceNo,  (select uuid from t_project_info where t_project_info.is_del =0 and    t_project_info.id = (select project_id from ${deviceTable} where is_del = 0 and ${deviceTable}.device_no =  ${alarmTable}.device_no  )  ) uuid from ${alarmTable} where id = #{id}
+
+    </select>
+
+
+    <select id="selectModifyUserName" resultType="java.lang.String">
+
+        select modify_user_name from ${tableName} where id=#{id}
+
+    </select>
+
+
+    <!-- 查询当月 所有未处理的报警-->
+    <select id="getAlarmInfo" resultType="com.xingyun.equipment.crane.modular.device.vo.AlarmInfoVO">
+        select * from (
+        select 1 flag ,em.name,ma.id , pi.name as projectName , ma.alarm_info alarmInfo, ma.device_no deviceNo
+        ,ma.`status`,DATE_FORMAT(ma.create_time ,'%Y-%m-%d %H:%i:%S')deviceTime
+        ,(
+        select case ma.alarm_id
+        when 1 then concat(dtl.pm25,' ug/m³')
+        when 2 then concat(dtl.pm25,' ug/m³')
+        when 3 then concat(dtl.pm10,' ug/m³')
+        when 4 then concat(dtl.pm10,' ug/m³')
+        when 5 then concat(dtl.temperature,' ℃')
+        when 6 then concat(dtl.temperature,' ℃')
+        when 7 then concat(dtl.temperature,' ℃')
+        when 8 then concat(dtl.temperature,' ℃')
+        when 9 then concat(dtl.humidity,' %rh')
+        when 10 then concat(dtl.humidity,' %rh')
+        when 11 then concat(dtl.humidity,' %rh')
+        when 12 then concat(dtl.humidity,' %rh')
+        when 13 then concat(dtl.noise,' 分贝')
+        when 14 then concat(dtl.noise,' 分贝')
+        when 15 then concat(dtl.wind_speed,' m/s')
+        when 16 then concat(dtl.wind_speed,' m/s')
+        end from t_project_environment_monitor_detail_${month} dtl where dtl.id = ma.detail_id
+
+        ) as `value`
+        from t_project_environment_monitor_alarm_${month} ma
+
+        LEFT JOIN t_project_environment_monitor em on em.id = ma.monitor_id
+
+        LEFT JOIN t_project_info pi on em.project_id = pi.id
+
+        where ma.`status` = 0 and ma.is_del=0 and pi.uuid in
+        (
+        <foreach collection="uuids" item="item" separator="," open="" close="">
+            #{item}
+        </foreach>
+        )
+        union ALL
+
+        select 2 flag ,l.name,la.id , pi.name as projectName , la.alarm_info alarmInfo, la.device_no deviceNo
+        ,la.`status` ,DATE_FORMAT(la.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime
+
+        ,(select case la.alarm_id
+        when 1 then concat(dtl.weight, ' T')
+        when 2 then concat(dtl.weight, ' T')
+        when 3 then concat(dtl.speed,' m/s')
+        when 4 then if(dtl.front_door_status=1,'打开','关闭')
+        when 5 then if(dtl.back_door_status=1,'打开','关闭')
+        end from t_project_lift_detail_${month} dtl where dtl.id = la.detail_id
+
+
+        ) as `value`
+        from t_project_lift_alarm_${month} la
+
+        LEFT JOIN t_project_lift l on l.id = la.lift_id
+
+        LEFT JOIN t_project_info pi on l.project_id = pi.id
+
+        where la.`status` = 0 and la.is_del=0 and pi.uuid in (
+        <foreach collection="uuids" item="item" separator="," open="" close="">
+            #{item}
+        </foreach>
+        )
+
+
+        UNION ALL
+
+        select 3 flag ,c.name,ca.id , pi.name as projectName , ca.alarm_info alarmInfo, ca.device_no deviceNo
+        ,ca.`status` ,DATE_FORMAT(ca.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime
+        ,(
+
+        select case ca.alarm_id
+        when 1 then concat(dtl.weight, ' T')
+        when 2 then concat(dtl.weight, ' T')
+        when 3 then concat(dtl.`range`,' m')
+        when 4 then concat(dtl.`range`,' m')
+        when 5 then concat(dtl.`range`,' m')
+        when 6 then concat(dtl.`range`,' m')
+        when 7 then concat(dtl.height,' m')
+        when 8 then concat(dtl.height,' m')
+        when 9 then concat(dtl.moment,' N.m')
+        when 10 then concat(dtl.moment,' N.m')
+        when 11 then ''
+        when 12 then ''
+        when 13 then ''
+        when 14 then ''
+        when 15 then concat(dtl.wind_speed,' m/s')
+        when 16 then concat(dtl.tilt_angle,' °')
+        end
+        from t_project_crane_detail_${month} dtl where dtl.id = ca.detail_id
+        ) as `value`
+        from t_project_crane_alarm_${month} ca
+
+        LEFT JOIN t_project_crane c on c.id = ca.crane_id
+
+        LEFT JOIN t_project_info pi on c.project_id = pi.id
+
+        where ca.`status` = 0 and ca.is_del=0 and pi.uuid in
+        (
+        <foreach collection="uuids" item="item" separator="," open="" close="">
+            #{item}
+        </foreach>
+        )
+        )
+        m order by deviceTime desc
+    </select>
+
+    <!-- 查询当月 所有未处理的报警-->
+    <select id="getAlarmInfoByFlag" resultType="com.xingyun.equipment.crane.modular.device.vo.AlarmInfoVO">
+        select * from (
+        <if test="flag == 1">
+
+            select 1 flag ,em.name,ma.id , pi.name as projectName , ma.alarm_info alarmInfo, ma.device_no deviceNo
+            ,ma.`status`,DATE_FORMAT(ma.create_time ,'%Y-%m-%d %H:%i:%S')deviceTime
+            ,(
+            select case ma.alarm_id
+            when 1 then concat(dtl.pm25,' ug/m³')
+            when 2 then concat(dtl.pm25,' ug/m³')
+            when 3 then concat(dtl.pm10,' ug/m³')
+            when 4 then concat(dtl.pm10,' ug/m³')
+            when 5 then concat(dtl.temperature,' ℃')
+            when 6 then concat(dtl.temperature,' ℃')
+            when 7 then concat(dtl.temperature,' ℃')
+            when 8 then concat(dtl.temperature,' ℃')
+            when 9 then concat(dtl.humidity,' %rh')
+            when 10 then concat(dtl.humidity,' %rh')
+            when 11 then concat(dtl.humidity,' %rh')
+            when 12 then concat(dtl.humidity,' %rh')
+            when 13 then concat(dtl.noise,' 分贝')
+            when 14 then concat(dtl.noise,' 分贝')
+            when 15 then concat(dtl.wind_speed,' m/s')
+            when 16 then concat(dtl.wind_speed,' m/s')
+            end from t_project_environment_monitor_detail_${month} dtl where dtl.id = ma.detail_id
+
+            ) as `value`
+            from t_project_environment_monitor_alarm_${month} ma
+
+            LEFT JOIN t_project_environment_monitor em on em.id = ma.monitor_id
+
+            LEFT JOIN t_project_info pi on em.project_id = pi.id
+
+            where ma.`status` = 0 and ma.is_del=0 and pi.uuid in
+            (
+            <foreach collection="uuids" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="flag == 2">
+            select 2 flag ,l.name,la.id , pi.name as projectName , la.alarm_info alarmInfo, la.device_no deviceNo
+            ,la.`status` ,DATE_FORMAT(la.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime
+
+            ,(select case la.alarm_id
+            when 1 then concat(dtl.weight, ' T')
+            when 2 then concat(dtl.weight, ' T')
+            when 3 then concat(dtl.speed,' m/s')
+            when 4 then if(dtl.front_door_status=1,'打开','关闭')
+            when 5 then if(dtl.back_door_status=1,'打开','关闭')
+            end from t_project_lift_detail_${month} dtl where dtl.id = la.detail_id
+
+
+            ) as `value`
+            from t_project_lift_alarm_${month} la
+
+            LEFT JOIN t_project_lift l on l.id = la.lift_id
+
+            LEFT JOIN t_project_info pi on l.project_id = pi.id
+
+            where la.`status` = 0 and la.is_del=0 and pi.uuid in (
+            <foreach collection="uuids" item="item" separator="," open="" close="">
+                #{item}
+            </foreach>
+            )
+
+        </if>
+
+
+
+<if test="flag == 3">
+    select 3 flag ,c.name,ca.id , pi.name as projectName , ca.alarm_info alarmInfo, ca.device_no deviceNo
+    ,ca.`status` ,DATE_FORMAT(ca.create_time ,'%Y-%m-%d %H:%i:%S') deviceTime
+    ,(
+
+    select case ca.alarm_id
+    when 1 then concat(dtl.weight, ' T')
+    when 2 then concat(dtl.weight, ' T')
+    when 3 then concat(dtl.`range`,' m')
+    when 4 then concat(dtl.`range`,' m')
+    when 5 then concat(dtl.`range`,' m')
+    when 6 then concat(dtl.`range`,' m')
+    when 7 then concat(dtl.height,' m')
+    when 8 then concat(dtl.height,' m')
+    when 9 then concat(dtl.moment,' N.m')
+    when 10 then concat(dtl.moment,' N.m')
+    when 11 then ''
+    when 12 then ''
+    when 13 then ''
+    when 14 then ''
+    when 15 then concat(dtl.wind_speed,' m/s')
+    when 16 then concat(dtl.tilt_angle,' °')
+    end
+    from t_project_crane_detail_${month} dtl where dtl.id = ca.detail_id
+    ) as `value`
+    from t_project_crane_alarm_${month} ca
+
+    LEFT JOIN t_project_crane c on c.id = ca.crane_id
+
+    LEFT JOIN t_project_info pi on c.project_id = pi.id
+
+    where ca.`status` = 0 and ca.is_del=0 and pi.uuid in
+    (
+    <foreach collection="uuids" item="item" separator="," open="" close="">
+        #{item}
+    </foreach>
+    )
+
+</if>
+        )
+        m order by deviceTime desc
+    </select>
+
+
+
+
+</mapper>

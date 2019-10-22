@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.ammeter.dao.ProjectElectricPowerDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.ammeter.model.ProjectElectricPowerDetail">
+        <id column="id" property="id" />
+        <result column="electric_id" property="electricId" />
+        <result column="current_degree" property="current" />
+        <result column="actual_degree" property="actualDegree" />
+        <result column="device_time" property="deviceTime" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, electric_id AS electricId, current_degree AS current, device_time AS deviceTime, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <insert id="create" useGeneratedKeys="true" keyProperty="t.id" parameterType="com.xywg.equipment.monitor.iot.modular.ammeter.model.ProjectElectricPowerDetail">
+        insert into ${tableName} (
+        is_del,create_time
+        <if test="t.id!=null">
+            ,id
+        </if>
+
+        <if test="t.electricId!=null">
+            ,electric_id
+        </if>
+
+        <if test="t.current!=null">
+            ,current_degree
+        </if>
+        <if test="t.actualDegree!=null">
+            ,actual_degree
+        </if>
+
+        <if test="t.deviceTime!=null">
+            ,device_time
+        </if>
+        <if test="t.comments!=null">
+            ,comments
+        </if>
+
+        <if test="t.createUser!=null">
+            ,create_user
+        </if>
+
+        <if test="t.modifyTime!=null">
+            ,modify_time
+        </if>
+
+        <if test="t.modifyUser!=null">
+            ,modify_user
+        </if>
+
+        )
+        values (
+        0,DATE_FORMAT(now(),'%Y-%m-%d %T')
+        <if test="t.id!=null">
+            ,#{t.id}
+        </if>
+        <if test="t.electricId!=null">
+            ,#{t.electricId}
+        </if>
+        <if test="t.current!=null">
+        ,#{t.current}
+        </if>
+        <if test="t.actualDegree!=null">
+            ,#{t.actualDegree}
+        </if>
+        <if test="t.deviceTime!=null">
+            ,#{t.deviceTime}
+        </if>
+        <if test="t.comments!=null">
+            ,#{t.comments}
+        </if>
+        <if test="t.createUser!=null">
+            ,#{t.createUser}
+        </if>
+        <if test="t.modifyTime!=null">
+            ,#{t.modifyTime}
+        </if>
+        <if test="t.modifyUser!=null">
+            ,#{t.modifyUser}
+        </if>
+        )
+    </insert>
+
+    <select id="getYearOnYear" resultType="java.math.BigDecimal">
+      select case when tt.current_degree is null then 1 else tt.current_degree end current from
+        (
+        select
+        ((select t.current_degree from ${tableName} t
+        where DATE(t.create_time) = ${theTime}
+        order by create_time desc
+        limit 1)
+        -
+        (select t.current_degree from ${tableName} t
+        where DATE(t.create_time) = ${theTime}
+        order by create_time asc
+        limit 1)) current
+        from dual
+        ) tt
+    </select>
+
+    <select id="getRingRatio" resultType="java.math.BigDecimal">
+      select case when tt.current_degree is null then 1 else tt.current_degree end current from
+        (
+        select
+        ((select t.current_degree from ${tableName} t
+        where DATE_FORMAT(t.create_time,"%Y-%m") = ${theTime}
+        order by create_time desc
+        limit 1)
+        -
+        (select t.current_degree from ${tableName} t
+        where DATE_FORMAT(t.create_time,"%Y-%m") = ${theTime}
+        order by create_time asc
+        limit 1)) current
+        from dual
+        ) tt
+    </select>
+</mapper>

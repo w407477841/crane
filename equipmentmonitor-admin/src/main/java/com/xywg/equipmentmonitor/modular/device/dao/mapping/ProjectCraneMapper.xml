@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectCraneMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectCrane">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="max_range" property="maxRange" />
+        <result column="max_weight" property="maxWeight" />
+        <result column="standard_height" property="standardHeight" />
+        <result column="fix_moment" property="fixMoment" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="is_online" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="place_point" property="placePoint" />
+        <result column="comments" property="comments" />
+        <result column="org_id" property="orgId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="name" property="name" />
+        <result column="gprs" property="gprs" />
+    	<result column="is_del" property="isDel" />
+    	<result column="create_time" property="createTime" />
+    	<result column="create_user" property="createUser" />
+    	<result column="modify_time" property="modifyTime" />
+    	<result column="modify_user" property="modifyUser" />
+        <result column="need_dispatch" property="needDispatch" />
+    </resultMap>
+
+    <resultMap id="MyBaseResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectCraneVO" extends="BaseResultMap">
+        <result column="projectName" property="projectName"/>
+        <result column="createUserName" property="createUserName"/>
+    </resultMap>
+        <resultMap id="CraneBaseResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectCraneDetailVO">
+        <result column="device_no" property="deviceNo"/>
+        <result column="range" property="range"/>
+        <result column="weight" property="weight"/>
+        <result column="height" property="height"/>
+        <result column="moment" property="moment"/>
+        <result column="rotary_angle" property="rotaryAngle"/>
+        <result column="tilt_angle" property="tiltAngle"/>
+        <result column="wind_speed" property="windSpeed"/>
+        <result column="name" property="dirverName"/>
+        <result column="certificate_no" property="dirverCertificateNo"/>
+        <result column="phone" property="dirverPhone"/>
+        <result column="dirver" property="driver"/>
+        <result column="create_time" property="createTime" />
+    </resultMap>  
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        project_id,
+        identifier,
+        specification,
+        owner,
+        manufactor,
+        max_range,
+        max_weight,
+        standard_height,
+        fix_moment,
+        wind_speed,
+        tilt_angle,
+        is_online,
+        status,
+        place_point,
+        comments,
+        org_id,
+        device_no,
+        gprs,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.project_id AS ${alias}_project_id,
+        ${alias}.identifier AS ${alias}_identifier,
+        ${alias}.specification AS ${alias}_specification,
+        ${alias}.owner AS ${alias}_owner,
+        ${alias}.manufactor AS ${alias}_manufactor,
+        ${alias}.max_range AS ${alias}_max_range,
+        ${alias}.max_weight AS ${alias}_max_weight,
+        ${alias}.standard_height AS ${alias}_standard_height,
+        ${alias}.fix_moment AS ${alias}_fix_moment,
+        ${alias}.wind_speed AS ${alias}_wind_speed,
+        ${alias}.tilt_angle AS ${alias}_tile_angle,
+        ${alias}.is_online AS ${alias}_is_online,
+        ${alias}.status AS ${alias}_status,
+        ${alias}.place_point AS ${alias}_place_point,
+        ${alias}.comments AS ${alias}_comments,
+        ${alias}.org_id AS ${alias}_org_id,
+        ${alias}.device_no AS ${alias}_device_no,
+        ${alias}.gprs AS ${alias}_gprs,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.project_id,
+        ${alias}.identifier,
+        ${alias}.specification,
+        ${alias}.owner,
+        ${alias}.manufactor,
+        ${alias}.max_range,
+        ${alias}.max_weight,
+        ${alias}.standard_height,
+        ${alias}.fix_moment,
+        ${alias}.wind_speed,
+        ${alias}.tilt_angle,
+        ${alias}.is_online,
+        ${alias}.status,
+        ${alias}.place_point,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.device_no,
+        ${alias}.name,
+        ${alias}.gprs,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+        ${alias}.need_dispatch,
+    </sql>
+
+    <!--条件分页查询-->
+    <select id="selectPageList" resultMap="MyBaseResultMap">
+        SELECT
+        <include refid="Column_List">
+            <property name="alias" value="a" />
+        </include>
+        if(a.is_online=1,'在线',"离线") as statusName,
+        b.name as projectName,
+        u.name as createUserName
+        from t_project_crane a
+        left join t_project_info b on a.project_id =b.id
+        left join t_sys_user u on u.id=a.create_user
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.id desc
+    </select>
+        <!--查询集团下所有塔吊(接口)-->
+    <select id="selectCraneList" resultMap="MyBaseResultMap">
+       SELECT
+        a.device_no,
+        a.project_id,
+        a.identifier,		
+        a.specification,			
+        a.owner,			
+        a.manufactor,			
+        a.max_range,			
+        a.max_weight,			
+        a.standard_height,			
+        a.fix_moment,			
+        a.wind_speed,			
+        a.tilt_angle,	
+        a.gprs,	
+        <!-- if(a.is_online=1,"在线","离线") as status, -->
+        a.is_online as status, 
+        b.name as projectName,
+        u.name as createUserName
+        from t_project_crane a
+        left join t_project_info b on a.project_id =b.id
+        left join t_sys_user u on u.id=a.create_user
+        where a.is_del = 0
+        and a.status = 1
+        <!--<if test="orgId !=null and orgId !=''">-->
+        <!--and a.org_id = #{orgId}-->
+        <!--</if>-->
+        <if test="orgIds !=null and orgIds.size > 0">
+        and a.org_id in <foreach close=")" collection="orgIds" item="listItem" open="(" separator=",">
+           #{listItem}
+        </foreach>
+        </if>
+       
+        
+        order by a.id desc
+    </select>
+
+    <!--判重-->
+    <select id="checkByDeviceNoAndProjectId" resultType="int">
+        select
+        count(*)
+        from t_project_crane
+        where device_no=#{t.body.deviceNo}
+        and  project_id=#{t.body.projectId}
+        and is_del=0
+    </select>
+
+    <!--占用-->
+    <update id="plusCallTimes">
+        update t_project_target_set_crane
+        set call_times=ifnull(call_times,0) +1
+        where specification =#{specification}
+        and manufactor =#{manufactor}
+    </update>
+
+    <!--删除占用-->
+    <update id="minusCallTimes">
+        update t_project_target_set_crane
+         set call_times=ifnull(call_times,0) -1
+         where specification =#{specification}
+         and manufactor =#{manufactor}
+    </update>
+
+    <!--不分页查询  地图用-->
+    <select id="getMapList" resultMap="MyBaseResultMap">
+        SELECT
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+--         ifnull((SELECT
+        if(a.is_online=1,"在线","离线") as statusName,
+        b.name as projectName,
+        c.name as createUserName
+        from t_project_crane a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_project_user c on c.id = a.create_user
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+    
+     <!--  查询塔吊最近一条数据-->
+    <select id="selectCraneDetail" resultMap="CraneBaseResultMap">
+      select 
+      b.device_no,
+      a.`range`,
+      a.weight,
+      a.height,
+      a.moment,
+      a.rotary_angle	,
+      a.tilt_angle,			
+      a.wind_speed,
+      c.name   ,
+      c.certificate_no ,
+      c.phone,
+      a.driver,
+      a.create_time
+      from ${tableName} as a
+      left join t_project_crane b on a.crane_id = b.id and b.is_del = 0
+      left join t_project_user c on c.id = a.driver and c.is_del =0
+      where a.is_del =0
+      <if test="deviceNo !=null and deviceNo !=''">
+      and b.device_no = '${deviceNo}'
+      </if>
+      <if test="orgId !=null and orgId !=''">
+      and b.org_id = ${orgId}
+      </if>
+      
+      ORDER BY a.create_time desc LIMIT 1
+      </select>
+
+
+    <select id="checkByDeviceNo" resultMap="BaseResultMap">
+        select
+        id,
+        device_no
+        from t_project_crane
+        where device_no=#{deviceNo}
+        and id!=#{id}
+        and status=1
+        and is_del=0
+    </select>
+
+    <!--更新 转发 字段-->
+    <update id="updateDispatch" >
+        update t_project_crane
+        set need_dispatch=1
+        where id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+</mapper>

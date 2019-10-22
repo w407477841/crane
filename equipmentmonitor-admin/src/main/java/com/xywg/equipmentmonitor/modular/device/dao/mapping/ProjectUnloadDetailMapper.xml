@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.unload.dao.ProjectUnloadDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectUnloadDetail">
+        <id column="id" property="id" />
+        <result column="unload_id" property="unloadId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="driver" property="driver" />
+        <result column="device_time" property="deviceTime" />
+        <result column="status" property="status" />
+        <result column="weight" property="weight" />
+        <result column="weight_percentage" property="weightPercentage" />
+        <result column="tilt_angle1" property="tiltAngle1" />
+        <result column="tilt_percent1" property="tiltPercent1" />
+        <result column="tilt_angle2" property="tiltAngle2" />
+        <result column="tilt_percent2" property="tiltPercent2" />
+        <result column="key1" property="key1" />
+        <result column="key2" property="key2" />
+        <result column="key3" property="key3" />
+        <result column="key4" property="key4" />
+        <result column="key5" property="key5" />
+        <result column="key6" property="key6" />
+        <result column="key7" property="key7" />
+        <result column="key8" property="key8" />
+        <result column="key9" property="key9" />
+        <result column="key10" property="key10" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, unload_id AS unloadId, device_no AS deviceNo, driver, device_time AS deviceTime, status, weight, weight_percentage AS weightPercentage, tilt_angle1 AS tiltAngle1, tilt_percent1 AS tiltPercent1, tilt_angle2 AS tiltAngle2, tilt_percent2 AS tiltPercent2, key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+</mapper>

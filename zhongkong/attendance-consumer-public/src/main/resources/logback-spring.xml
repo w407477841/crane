@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+scan：当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。
+scanPeriod：设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒当scan为true时，此属性生效。默认的时间间隔为1分钟。
+debug：当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。
+-->
+<configuration scan="false" scanPeriod="60 seconds" debug="false">
+    <!-- 定义日志的根目录 -->
+    <springProfile name="dev">
+        <property name="LOG_HOME" value="logs/consumer"/>
+    </springProfile>
+    <springProfile name="!dev">
+        <property name="LOG_HOME" value="logs/consumer"/>
+    </springProfile>
+
+    <!-- ch.qos.logback.core.ConsoleAppender 表示控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <springProfile name="dev">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
+            </springProfile>
+            <springProfile name="!dev">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
+            </springProfile>
+        </layout>
+    </appender>
+
+    <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+    <appender name="attendance" class="ch.qos.logback.core.rolling.RollingFileAppender"> <!-- 指定日志文件的名称 -->
+        <file>${LOG_HOME}/attendance.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/attendance-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <MaxHistory>45</MaxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!-- 日志输出格式： -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
+        </layout>
+    </appender>
+    <logger name="attendance" level="INFO" additivity="true">
+        <appender-ref ref="attendance"/>
+    </logger>
+
+
+    <!--
+    root与logger是父子关系，没有特别定义则默认为root，任何一个类只会和一个logger对应，
+    要么是定义的logger，要么是root，判断的关键在于找到这个logger，然后判断这个logger的appender和level。
+    -->
+    <root level="info">
+        <appender-ref ref="console"/>
+    </root>
+</configuration>

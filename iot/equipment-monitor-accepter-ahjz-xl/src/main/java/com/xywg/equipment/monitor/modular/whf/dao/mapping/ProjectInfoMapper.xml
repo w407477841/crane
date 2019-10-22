@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.crane.dao.ProjectInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectInfo">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="begin_date" property="beginDate" />
+        <result column="end_date" property="endDate" />
+        <result column="position" property="position" />
+        <result column="address" property="address" />
+        <result column="type" property="type" />
+        <result column="introduction" property="introduction" />
+        <result column="builder" property="builder" />
+        <result column="surveyor" property="surveyor" />
+        <result column="building_size" property="buildingSize" />
+        <result column="supervisor" property="supervisor" />
+        <result column="construction_unit" property="constructionUnit" />
+        <result column="manager" property="manager" />
+        <result column="manager_phone" property="managerPhone" />
+        <result column="fix_days" property="fixDays" />
+        <result column="place_point" property="placePoint" />
+        <result column="project_scope" property="projectScope" />
+        <result column="ichnography" property="ichnography" />
+        <result column="uuid" property="uuid" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="topic" property="topic" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, begin_date AS beginDate, end_date AS endDate, position, address, type, introduction, builder, surveyor, building_size AS buildingSize, supervisor, construction_unit AS constructionUnit, manager, manager_phone AS managerPhone, fix_days AS fixDays, place_point AS placePoint, project_scope AS projectScope, ichnography, uuid, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId, topic
+    </sql>
+
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.system.dao.OperationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.system.model.Operation">
+        <id column="id" property="id" />
+        <result column="parent_id" property="parentId" />
+        <result column="name" property="name" />
+        <result column="level" property="level" />
+        <result column="url" property="url" />
+        <result column="permission" property="permission" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, parent_id AS parentId, name, level, url, permission, type, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <select id="getUserOperations" resultMap="BaseResultMap">
+
+        SELECT *
+FROM
+	t_sys_operation
+WHERE
+ is_del = 0
+ and  level in (
+
+		<foreach collection="levels" item="level" close="" open="" separator=",">
+			#{level}
+		</foreach>
+		)
+ and type in (
+
+		<foreach collection="types" item="type" close="" open="" separator=",">
+			#{type}
+		</foreach>
+)
+ and
+	id IN (
+		SELECT
+			oper_id
+		FROM
+		t_sys_role_operation
+		WHERE
+			is_del = 0
+		AND role_id IN (
+			SELECT
+				id
+			FROM
+				t_sys_role
+			WHERE
+				<!--org_id = #{orgId} and-->
+			is_del = 0
+			AND id IN (
+				SELECT
+					role_id
+				FROM
+					t_sys_user_role
+				WHERE
+					user_id = #{userId} and is_del = 0
+				<!--AND org_id = #{orgId}-->
+			)
+		)
+	)
+
+    </select>
+
+	<select id="selectOperation" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.system.vo.OperationVo">
+		SELECT
+		id,parent_id AS parentId,name,level,url,permission,type,status,comments,create_time AS createTime,create_user AS createUser
+		FROM
+		t_sys_operation
+		WHERE is_del = 0
+		<if test="parentId != null">
+			AND parent_id = #{parentId}
+		</if>
+	</select>
+</mapper>

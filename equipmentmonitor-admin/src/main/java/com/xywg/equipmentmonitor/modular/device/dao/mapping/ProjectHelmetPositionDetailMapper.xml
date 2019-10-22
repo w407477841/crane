@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectHelmetPositionDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectHelmetPositionDetail">
+        <id column="id" property="id" />
+        <result column="helmet_id" property="helmetId" />
+        <result column="imei" property="imei" />
+        <result column="lng" property="lng" />
+        <result column="lat" property="lat" />
+        <result column="bd_lng" property="bdLng" />
+        <result column="bd_lat" property="bdLat" />
+        <result column="collect_time" property="collectTime" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        imei, bd_lng AS bdLng, bd_lat AS bdLat, collect_time AS collectTime
+    </sql>
+
+    <select id="getLastLocation" resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectHelmetPositionDetail">
+SELECT
+	<include refid="Base_Column_List"></include>
+        , (select id_card_number from t_project_helmet where t_project_helmet.id = ${tableName}.helmet_id) as idCardNumber
+FROM
+	${tableName}
+WHERE
+	id IN (
+	SELECT
+		max( id )
+	FROM
+		${tableName}
+	WHERE
+		collect_time > #{time}
+		AND helmet_id IN ( SELECT id FROM t_project_helmet WHERE project_id = #{projectId} and current_flag = 0 and is_del = 0
+        GROUP BY
+        helmet_id
+        )
+
+	)
+    </select>
+
+
+    <select id="getLocations" resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectHelmetPositionDetail">
+        select * from (
+        <foreach collection="tables" item="tableName" open="" close="" separator="UNION ALL">
+            SELECT
+            <include
+                    refid="Base_Column_List"></include>
+            , (select id_card_number from t_project_helmet where t_project_helmet.id = ${tableName}.helmet_id) as
+            idCardNumber
+            FROM
+            ${tableName}
+            WHERE
+
+            collect_time between #{beginTime} and #{endTime}
+            AND helmet_id IN ( SELECT id FROM t_project_helmet WHERE project_id = #{projectId} and current_flag = 0 and
+            is_del = 0 )
+
+        </foreach>
+        ) m
+        order by collectTime desc
+    </select>
+</mapper>

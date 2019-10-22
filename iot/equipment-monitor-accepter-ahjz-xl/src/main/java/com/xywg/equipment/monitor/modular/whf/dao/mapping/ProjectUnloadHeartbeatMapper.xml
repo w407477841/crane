@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.unload.dao.ProjectUnloadHeartbeatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectUnloadHeartbeat">
+        <id column="id" property="id" />
+        <result column="unload_id" property="unloadId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="end_time" property="endTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, unload_id AS unloadId, device_no AS deviceNo, status, create_time AS createTime, end_time AS endTime
+    </sql>
+
+</mapper>

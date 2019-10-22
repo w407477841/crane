@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.station.dao.ProjectMapStationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.station.model.ProjectMapStation">
+        <id column="id" property="id" />
+        <result column="map_id" property="mapId" />
+        <result column="station_id" property="stationId" />
+        <result column="station_no" property="stationNo" />
+        <result column="x_zhou" property="xZhou" />
+        <result column="y_zhou" property="yZhou" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, map_id AS mapId, station_id AS stationId, station_no AS stationNo, x_zhou AS xZhou, y_zhou AS yZhou, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+    <delete id="deleteByMapId">
+        delete from t_project_map_station where map_id  = #{mapId}
+    </delete>
+
+</mapper>

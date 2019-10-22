@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.crane.dao.ProjectCraneMutiCollisionAvoidanceSetMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.crane.model.ProjectCraneMutiCollisionAvoidanceSet">
+        <id column="id" property="id" />
+        <result column="device_no" property="deviceNo" />
+        <result column="project_id" property="projectId" />
+        <result column="sequence" property="sequence" />
+        <result column="crane_no" property="craneNo" />
+        <result column="arm_length" property="armLength" />
+        <result column="relative_distance" property="relativeDistance" />
+        <result column="relative_angle" property="relativeAngle" />
+        <result column="relative_height" property="relativeHeight" />
+        <result column="current_angle" property="currentAngle" />
+        <result column="current_height" property="currentHeight" />
+        <result column="status" property="status" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, device_no AS deviceNo, project_id AS projectId, sequence, crane_no AS craneNo, arm_length AS armLength, relative_distance AS relativeDistance, relative_angle AS relativeAngle, relative_height AS relativeHeight, current_angle AS currentAngle, current_height AS currentHeight, status, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+</mapper>

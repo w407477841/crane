@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.device.dao.ProjectElectricPowerDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.device.model.ProjectElectricPowerDetail">
+        <id column="id" property="id" />
+        <result column="electric_id" property="electricId" />
+        <result column="current_degree" property="currentDegree" />
+        <result column="actual_degree" property="actualDegree" />
+        <result column="device_time" property="deviceTime" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, electric_id AS electricId, current_degree AS currentDegree,actual_degree AS actualDegree,device_time AS deviceTime, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+	<select id="eveSum" resultType="java.util.Map">
+		select  DATE_FORMAT(
+		statistics_date,
+		'%Y-%m-%d'
+		)  as `xAxis` , sum(amount_used) as `yAxis` from t_project_ammeter_daily where device_id in
+		(
+		select id from t_project_electric_power where project_id in(
+		select id from t_project_info where uuid = #{uuid}
+		)
+
+		<if test="type != null"> and type = #{type}
+		</if>
+		)
+			 and statistics_date >= '${date}'
+		GROUP BY statistics_date
+	</select>
+
+	<select id="selectPageList" resultType="com.xingyun.equipment.admin.modular.device.model.ProjectElectricPowerDetail">
+        select * from (
+            <foreach collection="map.months"  item="month"  open="" close="" separator="UNION ALL" >
+                select
+                      <include refid="Base_Column_List" />
+                from
+                     t_project_electric_power_detail_${month}
+                where is_del=0
+                <if test="map.electricId!=null ">
+                    and electric_id = #{map.electricId}
+                </if>
+                <if test="map.status!=null ">
+                    and status = #{map.status}
+                </if>
+                <if test="map.startTime!=null and map.startTime!='' ">
+                    and device_time >= #{map.startTime}
+                </if>
+                <if test="map.endTime!=null and map.endTime!='' ">
+                    and device_time &lt;= #{map.endTime}
+                </if>
+            </foreach>
+        ) m
+        order by m.createTime desc
+    </select>
+
+    <select id="getOneDaydegree" resultType="java.lang.Double">
+        select sum(l.degree-f.degree) degree from
+        (SELECT
+        electric_id ,
+		actual_degree degree
+        FROM
+        t_project_electric_power_detail_${month}
+        WHERE
+        DATE_FORMAT(
+        create_time,
+        '%Y-%m-%d %H:%i:%s'
+        ) LIKE '${daily}%'
+        AND electric_id IN (
+        SELECT
+        id
+        FROM
+        t_project_electric_power
+        WHERE
+
+        project_id = (
+        SELECT
+        id
+        FROM
+        t_project_info
+        WHERE
+        uuid = #{uuid}
+        )
+        <if test="type != null" >
+            and  `type`  = #{type}
+        </if>
+        )
+        GROUP BY
+        electric_id
+
+        ) f
+
+        LEFT JOIN
+        (SELECT
+        electric_id ,
+		actual_degree degree
+        FROM t_project_electric_power_detail_${month} where id in(
+        (select max(id) from t_project_electric_power_detail_${month} where  DATE_FORMAT(
+        create_time,
+        '%Y-%m-%d %H:%i:%s'
+        ) LIKE '${daily}%'
+        AND electric_id IN (
+        SELECT
+        id
+        FROM
+        t_project_electric_power
+        WHERE
+        project_id = (
+        SELECT
+        id
+        FROM
+        t_project_info
+        WHERE
+        uuid = #{uuid}
+        )
+        <if test="type != null" >
+            and  `type`  = #{type}
+        </if>
+        ) GROUP BY
+        electric_id
+        )
+        )
+
+        ) l on f.electric_id = l.electric_id
+
+
+    </select>
+    
+    <select id="selectElectrType" resultType="com.xingyun.equipment.admin.modular.device.model.ElectricityType">
+    	select sum(a.amount_used) as electricity, 
+    	       (case when b.type=1 then '生活用电' when b.type=2 then '生产用电'  else '其它' end) as typeName 
+    	from t_project_ammeter_daily a
+    	left join t_project_electric_power b on b.id = a.device_id and b.is_del = 0
+    	<where>
+    		a.statistics_date > date_sub(curdate(), interval 8 day)
+			and b.project_id in 
+			(select id from t_project_info where 
+			uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													#{listItem}
+						</foreach>
+			)
+		</where>
+		group by b.type	
+    </select>
+    
+    <select id="selectElectrByMonth" resultType="com.xingyun.equipment.admin.modular.device.model.ElectricityType">
+    	select sum(ifnull(a.amount_used,0)) as electricity 
+    	from t_project_ammeter_daily a
+    	left join t_project_electric_power b on b.id = a.device_id and b.is_del = 0
+    	<where>
+    	left (statistics_date, 7) = #{date}
+    	</where>
+    </select>
+    
+    <select id="selectElectrTrend" resultType="com.xingyun.equipment.admin.modular.device.model.ElectricityTrend">
+    	select a.trendDate, ifnull(b.electricity,0) as electricity
+    	from 
+    	(
+    	<!-- SELECT curdate() as trendDate
+	    union all -->
+	    SELECT date_sub(curdate(), interval 1 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 2 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 3 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 4 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 5 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 6 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 7 day) as trendDate
+	    ) a
+	    left join 
+	    (
+	    select sum(c.amount_used) as electricity, c.statistics_date as trendDate from t_project_ammeter_daily c
+	    left join t_project_electric_power d on d.id = c.device_id and d.is_del = 0
+	    <where>
+	    d.type = #{type}
+	    and c.statistics_date > date_sub(curdate(), interval 8 day)
+	    and d.project_id in 
+			(select id from t_project_info where 
+			uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													#{listItem}
+						</foreach>
+			)
+	    </where>
+	    group by c.statistics_date
+	    ) b on b.trendDate = a.trendDate
+	    <!-- <where>
+	     b.electricity is not null
+	    </where> -->
+	    order by a.trendDate asc
+    </select>
+    
+     <select id="selectWatType" resultType="com.xingyun.equipment.admin.modular.device.model.WaterType">
+    	select sum(a.amount_used) as water, 
+    	       (case when b.type=1 then '生活用水' when b.type=2 then '生产用水'    when b.type=3 then '消防用水' else '其它' end) as typeName 
+    	from t_project_water_daily a
+    	left join t_project_water_meter b on b.id = a.device_id and b.is_del = 0
+    	<where>
+    		a.statistics_date > date_sub(curdate(), interval 8 day)
+			and b.project_id in 
+			(select id from t_project_info where 
+			uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													#{listItem}
+						</foreach>
+			)
+		</where>
+		group by b.type	
+    </select>
+    
+    <select id="selectWatByMonth" resultType="com.xingyun.equipment.admin.modular.device.model.WaterType">
+    	select sum(ifnull(a.amount_used,0)) as water 
+    	from t_project_water_daily a
+    	left join t_project_water_meter b on b.id = a.device_id and b.is_del = 0
+    	<where>
+    	left (statistics_date, 7) = #{date}
+    	</where>
+    </select>
+    
+    <select id="selectWatTrend" resultType="com.xingyun.equipment.admin.modular.device.model.WaterTrend">
+    	select a.trendDate, ifnull(b.water,0) as water
+    	from 
+    	(
+    	<!-- SELECT curdate() as trendDate
+	    union all -->
+	    SELECT date_sub(curdate(), interval 1 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 2 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 3 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 4 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 5 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 6 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 7 day) as trendDate
+	    ) a
+	    left join 
+	    (
+	    select sum(c.amount_used) as water, c.statistics_date as trendDate from t_project_water_daily c
+	    left join t_project_water_meter d on d.id = c.device_id and d.is_del = 0
+	    <where>
+	    d.type = #{type}
+	    and c.statistics_date > date_sub(curdate(), interval 8 day)
+	    and d.project_id in 
+			(select id from t_project_info where 
+			uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													#{listItem}
+						</foreach>
+			)
+	    </where>
+	    group by c.statistics_date
+	    ) b on b.trendDate = a.trendDate
+	    <!-- <where>
+	     b.water is not null
+	    </where>
+ -->	    order by a.trendDate asc
+    </select>
+
+	<!-- 查询用电分类信息 -->
+	<select id="selectElectricityType" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.ElectricityType" >
+		select sum(m.current_degree) as electricity, 
+			(case when m.type=1 then '生活用电' when m.type=2 then '生产用电'  else '其它' end) as typeName 
+			from 
+			(select a.electric_id, max(a.current_degree) as current_degree, b.type 
+			from ${tableName} a
+			left join t_project_electric_power b on b.id = a.electric_id and b.is_del = 0
+			<where>
+			b.project_id in 
+			(select id from t_project_info where 
+			uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													#{listItem}
+						</foreach>
+			)
+			</where>			
+			group by b.type, a.electric_id) m
+		group by m.type
+	</select>
+	
+	<!-- 按月查询用电量 -->
+	<select id="selectElectricityByMonth" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.ElectricityType" statementType="STATEMENT">
+		select sum(m.current_degree) as electricity
+			from 
+			(select a.electric_id, max(a.current_degree) as current_degree, b.type 
+			from ${tableName} a
+			left join t_project_electric_power b on b.id = a.electric_id and b.is_del = 0
+			<where>
+			b.project_id in 
+			(select id from t_project_info where 
+			uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+			)
+			</where>			
+			group by a.electric_id) m
+	</select>
+	
+	<!-- 查询用电趋势 -->
+	<select id="selectElectricityTrend" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.ElectricityTrend" statementType="STATEMENT">
+		select a.trendDate,ifnull(b.electricity,0) as electricity
+		from
+		 (SELECT curdate() as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 1 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 2 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 3 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 4 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 5 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 6 day) as trendDate
+	    ) a
+		left join 
+		(
+			select (b.current_degree - c.current_degree) as electricity, b.trendDate from 
+			(
+				select sum(h.current_degree) as current_degree, h.trendDate from 
+				(
+				select max(m.current_degree) as current_degree, left(m.create_time,10) as trendDate from ${tableName} m
+				left join t_project_electric_power n on n.id = m.electric_id and n.is_del = 0
+				<where>
+					n.project_id in 
+					(select id from t_project_info where
+					 uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					)
+				</where>
+				group by left(m.create_time,10),m.electric_id
+				)h 
+				group by h.trendDate
+			)b
+			left join 
+			(
+				select sum(h.current_degree) as current_degree,h.trendDate from 
+				(
+				select max(f.current_degree) as current_degree, left(f.create_time,10) as trendDate from ${tableName} f
+				left join t_project_electric_power g on g.id = f.electric_id and g.is_del = 0
+				<where>
+					g.project_id in 
+					(select id from t_project_info where 
+					uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					)
+				</where>
+				group by left(f.create_time,10),f.electric_id
+				)h 
+				group by h.trendDate 
+			)c 
+			on DATE_ADD(c.trendDate,INTERVAL 1 DAY) = b.trendDate
+		)b
+		on b.trendDate = a.trendDate order by a.trendDate desc
+	</select>
+	<!-- 7天用电跨月用电趋势 -->
+	<select id="selectLastElectricityTrend" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.ElectricityTrend" statementType="STATEMENT">
+		select (b.current_degree - c.current_degree) as electricity, b.trendDate from 
+			(
+				select sum(h.current_degree) as current_degree, h.trendDate from 
+				(
+				select max(m.current_degree) as current_degree, left(m.create_time,10) as trendDate from ${tableName} m
+				left join t_project_electric_power n on n.id = m.electric_id and n.is_del = 0
+				<where>
+					n.project_id in 
+					(select id from t_project_info where
+					 uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					) and left(m.create_time,10) > '${lastMonthDay}'
+				</where>
+				group by left(m.create_time,10),m.electric_id
+				)h 
+				group by h.trendDate
+			)b
+			left join 
+			(
+				select sum(h.current_degree) as current_degree,h.trendDate from 
+				(
+				select max(f.current_degree) as current_degree, left(f.create_time,10) as trendDate from ${tableName} f
+				left join t_project_electric_power g on g.id = f.electric_id and g.is_del = 0
+				<where>
+					g.project_id in 
+					(select id from t_project_info where 
+					 uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					) and left(m.create_time,10) > '${lastMonthDay}'
+				</where>
+				group by left(f.create_time,10),f.electric_id
+				)h 
+				group by h.trendDate 
+			)c 
+			on DATE_ADD(c.trendDate,INTERVAL 1 DAY) = b.trendDate
+			order by b.trendDate desc
+	</select>
+	
+	<!-- 查询用水分类信息 -->
+	<select id="selectWaterType" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.WaterType" statementType="STATEMENT">
+		select sum(m.current_degree) as water, 
+			(case when m.type=1 then '生活用水'  when m.type=2 then '生产用水' when m.type=3 then '消防用水' else '其它' end) as typeName 
+			from 
+			(select a.electric_id, max(a.current_degree) as current_degree, b.type 
+			from ${tableName} a
+			left join t_project_water_meter b on b.id = a.electric_id and b.is_del = 0
+			<where>
+			b.project_id in 
+			(select id from t_project_info where 
+			 uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+			)
+			</where>			
+			group by b.type, a.electric_id) m
+		group by m.type
+	</select>
+	
+	<!-- 按月查询用水量 -->
+	<select id="selectWaterByMonth" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.WaterType" statementType="STATEMENT">
+		select sum(m.current_degree) as water
+			from 
+			(select a.electric_id, max(a.current_degree) as current_degree, b.type 
+			from ${tableName} a
+			left join t_project_water_meter b on b.id = a.electric_id and b.is_del = 0
+			<where>
+			b.project_id in 
+			(select id from t_project_info where 
+			 uuid in
+				   <foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+			)
+			</where>			
+			group by a.electric_id) m
+	</select>
+	
+	<!-- 查询用水趋势 -->
+	<select id="selectWaterTrend" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.WaterTrend" statementType="STATEMENT">
+		select a.trendDate,ifnull(b.water,0) as water
+		from
+		 (SELECT curdate() as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 1 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 2 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 3 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 4 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 5 day) as trendDate
+	    union all
+	    SELECT date_sub(curdate(), interval 6 day) as trendDate
+	    ) a
+		left join 
+		(
+			select (b.current_degree - c.current_degree) as water, b.trendDate from 
+			(
+				select sum(h.current_degree) as current_degree, h.trendDate from 
+				(
+				select max(m.current_degree) as current_degree, left(m.create_time,10) as trendDate from ${tableName} m
+				left join t_project_water_meter n on n.id = m.electric_id and n.is_del = 0
+				<where>
+					n.project_id in 
+					(select id from t_project_info where 
+					 uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					)
+				</where>
+				group by left(m.create_time,10),m.electric_id
+				)h 
+				group by h.trendDate
+			)b
+			left join 
+			(
+				select sum(h.current_degree) as current_degree,h.trendDate from 
+				(
+				select max(f.current_degree) as current_degree, left(f.create_time,10) as trendDate from ${tableName} f
+				left join t_project_water_meter g on g.id = f.electric_id and g.is_del = 0
+				<where>
+					g.project_id in 
+					(select id from t_project_info where 
+					 uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					)
+				</where>
+				group by left(f.create_time,10),f.electric_id
+				)h 
+				group by h.trendDate 
+			)c 
+			on DATE_ADD(c.trendDate,INTERVAL 1 DAY) = b.trendDate
+		)b
+		on b.trendDate = a.trendDate order by a.trendDate desc
+	</select>
+	<!-- 7天用水跨月用水趋势 -->
+	<select id="selectLastWaterTrend" parameterType="java.util.Map" resultType="com.xingyun.equipment.admin.modular.device.model.WaterTrend" statementType="STATEMENT">
+		select (b.current_degree - c.current_degree) as water, b.trendDate from 
+			(
+				select sum(h.current_degree) as current_degree, h.trendDate from 
+				(
+				select max(m.current_degree) as current_degree, left(m.create_time,10) as trendDate from ${tableName} m
+				left join t_project_water_meter n on n.id = m.electric_id and n.is_del = 0
+				<where>
+					n.project_id in 
+					(select id from t_project_info where 
+					 uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					) and left(m.create_time,10) > '${lastMonthDay}'
+				</where>
+				group by left(m.create_time,10),m.electric_id
+				)h 
+				group by h.trendDate
+			)b
+			left join 
+			(
+				select sum(h.current_degree) as current_degree,h.trendDate from 
+				(
+				select max(f.current_degree) as current_degree, left(f.create_time,10) as trendDate from ${tableName} f
+				left join t_project_water_meter g on g.id = f.electric_id and g.is_del = 0
+				<where>
+					g.project_id in 
+					(select id from t_project_info where 
+					 uuid in
+				   		<foreach close=")" collection="list" item="listItem" open="(" separator=",">
+													'${listItem}'
+						</foreach>
+					) and left(m.create_time,10) > '${lastMonthDay}'
+				</where>
+				group by left(f.create_time,10),f.electric_id
+				)h 
+				group by h.trendDate 
+			)c 
+			on DATE_ADD(c.trendDate,INTERVAL 1 DAY) = b.trendDate
+			order by b.trendDate desc
+	</select>
+	
+</mapper>

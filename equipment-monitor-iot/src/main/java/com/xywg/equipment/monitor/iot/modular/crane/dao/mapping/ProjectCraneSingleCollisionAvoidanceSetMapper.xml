@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.xywg.equipment.monitor.iot.modular.crane.dao.ProjectCraneSingleCollisionAvoidanceSetMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.xywg.equipment.monitor.iot.modular.crane.model.ProjectCraneSingleCollisionAvoidanceSet">
+		<id column="id" property="id" />
+		<result column="device_no" property="deviceNo" />
+		<result column="project_id" property="projectId" />
+		<result column="start_angle" property="startAngle" />
+		<result column="end_angle" property="endAngle" />
+		<result column="start_height" property="startHeight" />
+		<result column="end_height" property="endHeight" />
+		<result column="start_range" property="startRange" />
+		<result column="end_range" property="endRange" />
+		<result column="status" property="status" />
+		<result column="page_range" property="pageRange" />
+		<result column="is_del" property="isDel" />
+		<result column="create_time" property="createTime" />
+		<result column="create_user" property="createUser" />
+		<result column="modify_time" property="modifyTime" />
+		<result column="modify_user" property="modifyUser" />
+	</resultMap>
+
+
+
+</mapper>

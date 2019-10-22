@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.remotesetting.dao.DeviceLogManagementMapper">
+
+
+    <select id="getPageList" resultType="com.xywg.equipmentmonitor.modular.remotesetting.model.DeviceLogInfo">
+       select id,projectId,deviceNo,projectName,deviceType,`version` from (
+            select
+                a.id,
+                a.project_id as projectId,
+                a.device_no as deviceNo,
+                b.name as projectName,
+                1  as  deviceType,
+                a.firmware_version as version
+            from t_project_crane a
+            left join t_project_info b on a.project_id=b.id and b.is_del=0
+            where a.is_del=0
+            union all
+            select
+                    a.id,
+                    a.project_id as projectId,
+                    a.device_no as deviceNo,
+                    b.name as projectName,
+                    2  as  deviceType,
+                    a.firmware_version as version
+            from t_project_lift a
+            left join t_project_info b on a.project_id=b.id and b.is_del=0
+            where a.is_del=0
+            union all
+            select
+                    a.id,
+                    a.project_id as projectId,
+                    a.device_no as deviceNo,
+                    b.name as projectName,
+                    3  as  deviceType,
+                    a.firmware_version as version
+            from t_project_environment_monitor a
+            left join t_project_info b on a.project_id=b.id and b.is_del=0
+            where a.is_del=0
+        )X
+        where 1=1
+        <if test="deviceLogInfo.deviceType !=null  and deviceLogInfo.deviceType != ''">
+            and X.deviceType = #{deviceLogInfo.deviceType}
+        </if>
+        <if test="deviceLogInfo.key !=null  and deviceLogInfo.key !=''">
+            and (
+                X.projectName like concat('%',#{deviceLogInfo.key},'%')
+                or  X.deviceNo like concat('%',#{deviceLogInfo.key},'%')
+            )
+        </if>
+        order by deviceType,deviceNo desc
+    </select>
+
+
+</mapper>

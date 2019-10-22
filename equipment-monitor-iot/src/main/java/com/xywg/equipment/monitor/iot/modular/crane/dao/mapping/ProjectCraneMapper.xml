@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.crane.dao.ProjectCraneMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.crane.model.ProjectCrane">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="device_no" property="deviceNo" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="max_range" property="maxRange" />
+        <result column="max_weight" property="maxWeight" />
+        <result column="standard_height" property="standardHeight" />
+        <result column="fix_moment" property="fixMoment" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="type" property="type" />
+        <result column="login_name" property="loginName" />
+        <result column="password" property="password" />
+        <result column="ip_address" property="ipAddress" />
+        <result column="port" property="port" />
+        <result column="platform_type" property="platformType" />
+        <result column="tunnel" property="tunnel" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, identifier, specification, device_no AS deviceNo, owner, manufactor, max_range AS maxRange, max_weight AS maxWeight, standard_height AS standardHeight, fix_moment AS fixMoment, wind_speed AS windSpeed, tilt_angle AS tiltAngle, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId, type, login_name AS loginName, password, ip_address AS ipAddress, port, platform_type AS platformType, tunnel
+    </sql>
+
+    <select id="selectAllDevice"  resultType="java.util.Map">
+
+        select GROUP_CONCAT(m.device_type) deviceStr,uuid from
+        (select CONCAT('sjjht',':',device_no) device_type , (select uuid from t_project_info where id =t_project_lift.project_id ) uuid from  t_project_lift where is_del = 0
+        UNION ALl
+        select CONCAT('qzjht',':',device_no) device_type ,(select uuid from t_project_info where id =t_project_crane.project_id ) from  t_project_crane where is_del = 0
+        UNION ALl
+        select CONCAT('ycht',':',device_no) device_type ,(select uuid from t_project_info where id =t_project_environment_monitor.project_id ) from  t_project_environment_monitor where is_del = 0
+        union ALL
+        select concat('dbht',':',device_no) device_type ,(select uuid from t_project_info where id =t_project_electric_power.project_id ) from  t_project_electric_power where is_del = 0
+        union ALL
+        select concat('sbht',':',device_no) device_type ,(select uuid from t_project_info where id =t_project_water_meter.project_id ) from  t_project_water_meter where is_del = 0
+        ) m
+        GROUP BY uuid
+
+
+
+    </select>
+
+    <update id="doDeviceOnlineChange">
+      update ${tableName} set is_online = ${status} where device_no = ${deviceNo} and is_del = 0
+    </update>
+
+</mapper>

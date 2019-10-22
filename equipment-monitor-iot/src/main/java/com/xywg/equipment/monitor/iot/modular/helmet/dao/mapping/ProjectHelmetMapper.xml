@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.helmet.dao.ProjectHelmetMapper">
+
+   <!-- &lt;!&ndash; 通用查询映射结果 &ndash;&gt;
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.crane.model.ProjectCraneAlarm">
+        <id column="id" property="id" />
+        <result column="crane_id" property="craneId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="alarm_info" property="alarmInfo" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    &lt;!&ndash; 通用查询结果列 &ndash;&gt;
+    <sql id="Base_Column_List">
+        id, crane_id AS craneId, device_no AS deviceNo, alarm_info AS alarmInfo, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>-->
+
+</mapper>

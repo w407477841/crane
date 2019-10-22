@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.crane.dao.ProjectCraneCyclicWorkDurationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.crane.model.ProjectCraneCyclicWorkDuration">
+            <id column="id" property="id" />
+                                                                                                    <result column="crane_id" property="craneId" />
+                    <result column="device_no" property="deviceNo" />
+                    <result column="begin_height" property="beginHeight" />
+                    <result column="end_height" property="endHeight" />
+                    <result column="begin_range" property="beginRange" />
+                    <result column="end_range" property="endRange" />
+                    <result column="begin_moment" property="beginMoment" />
+                    <result column="weight" property="weight" />
+                    <result column="safety_weight" property="safetyWeight" />
+                    <result column="wind_speed" property="windSpeed" />
+                    <result column="begin_angle" property="beginAngle" />
+                    <result column="end_angle" property="endAngle" />
+                    <result column="moment_percentage" property="momentPercentage" />
+                    <result column="multiple_rate" property="multipleRate" />
+                    <result column="begin_time" property="beginTime" />
+                    <result column="end_time" property="endTime" />
+        </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+    id, crane_id AS craneId, device_no AS deviceNo, begin_height AS beginHeight, end_height AS endHeight, begin_range AS beginRange, end_range AS endRange, begin_moment AS beginMoment, weight, safety_weight AS safetyWeight, wind_speed AS windSpeed, begin_angle AS beginAngle, end_angle AS endAngle, moment_percentage AS momentPercentage, multiple_rate AS multipleRate, begin_time AS beginTime, end_time AS endTime
+    </sql>
+
+</mapper>

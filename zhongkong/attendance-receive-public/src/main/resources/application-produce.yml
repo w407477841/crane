@@ -1,0 +1,31 @@
+server:
+  port: 19999
+xywg:
+  monitor-port: 18890  #监听端口,多个请以逗号分隔
+  communication-private-key: xywg123   #与设备通信中的私钥
+
+spring:
+  redis:
+     host: 192.168.1.24
+     port: 6379
+     password: suzhong@123
+     max-idle: 500
+     min-idle: 50
+     active: 2000
+     wait: 1000
+     cahce-names: xywg-sbgl-day-2,xywg-sbgl-min-30,xywg-sbgl-min-2,xywg-sbgl-hour-2
+
+  rabbitmq:
+      username: admin
+      password: a%SCg6Kq
+      #virtualHost: XXX
+      addresses: 192.168.1.24:5672
+      publisher-confirms: true
+
+
+
+
+
+
+
+

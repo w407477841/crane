@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.baseinfo.dao.ProjectUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.baseinfo.model.ProjectUser">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="name" property="name" />
+        <result column="identity_code" property="identityCode" />
+        <result column="phone" property="phone" />
+        <result column="certificate_type" property="certificateType" />
+        <result column="certificate_name" property="certificateName" />
+        <result column="certificate_no" property="certificateNo" />
+        <result column="begin_date" property="beginDate" />
+        <result column="end_date" property="endDate" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, name, identity_code AS identityCode, phone, certificate_type AS certificateType, certificate_name AS certificateName, certificate_no AS certificateNo, begin_date AS beginDate, end_date AS endDate, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+
+    <select id="selectUserInfo" parameterType="java.util.Map" resultType="com.xingyun.equipment.crane.modular.baseinfo.vo.ProjectUserVo">
+        SELECT
+        pu.id,pu.project_id AS projectId,pu.name,pu.identity_code AS identityCode,pu.phone,pu.certificate_type AS certificateType,
+        pu.certificate_name AS certificateName,pu.certificate_no AS certificateNo,pu.begin_date AS beginDate,pu.end_date AS endDate,
+        pu.status,pu.comments,pu.create_time AS createTime,pu.create_user AS createUser,pi.name AS projectName,u.name AS createUserName,
+        mct.name AS certificateTypeName
+        FROM
+        t_project_user pu
+        LEFT JOIN
+        t_project_info pi
+        ON pu.project_id = pi.id
+        LEFT JOIN
+        t_sys_user u
+        ON u.id = pu.create_user
+        LEFT JOIN
+        t_project_master_cetificate_type mct
+        ON mct.id = pu.certificate_type
+        WHERE pu.is_del = 0 AND (pu.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        OR
+        pi.builder IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        )
+        <if test="key != null and key != ''">
+            AND pu.certificate_type = #{key}
+        </if>
+        ORDER BY pu.create_time DESC
+    </select>
+
+    <select id="selectUser" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        t_project_user
+        WHERE is_del = 0 AND org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="selectUserByProjectId" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        t_project_user
+        WHERE is_del = 0
+        <if test="projectId != null ">
+            and  project_id = #{projectId}
+        </if>
+    </select>
+
+
+    <select id="selectPageList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_project_user a
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="selectProjectByCode" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        t_project_user
+        WHERE identity_code = #{identityCode}
+        <if test="id != null and id != ''">
+            AND id != #{id}
+        </if>
+    </select>
+</mapper>

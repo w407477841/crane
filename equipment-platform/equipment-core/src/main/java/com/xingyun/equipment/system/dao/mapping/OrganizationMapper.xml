@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.system.dao.OrganizationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.system.model.Organization">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="level" property="level" />
+        <result column="parent_id" property="parentId" />
+        <result column="group_id" property="groupId" />
+        <result column="introduction" property="introduction" />
+        <result column="flag" property="flag" />
+        <result column="relation_org_id" property="relationOrgId" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, level, parent_id AS parentId, group_id AS groupId, introduction, flag, relation_org_id AS relationOrgId, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <select id="selectOrganizationInfo" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.vo.OrganizationVo">
+        SELECT
+        id,name,level,parent_id AS parentId,group_id AS groupId,introduction,flag,relation_org_id AS relationOrgId,
+        status,comments,create_time AS createTime,create_user AS createUser
+        FROM
+        t_sys_organization
+        WHERE is_del = 0 AND id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectOrganization" parameterType="java.util.Map" resultType="com.xingyun.equipment.system.model.Organization">
+        SELECT
+        id,name,level,parent_id AS parentId,group_id AS groupId,introduction,flag,relation_org_id AS relationOrgId,
+        status,comments,create_time AS createTime,create_user AS createUser
+        FROM
+        t_sys_organization
+        WHERE is_del = 0 AND level = 4 AND id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

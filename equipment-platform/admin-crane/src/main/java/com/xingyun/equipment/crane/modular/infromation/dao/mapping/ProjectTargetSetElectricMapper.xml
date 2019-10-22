@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.infromation.dao.ProjectTargetSetElectricMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.infromation.model.ProjectTargetSetElectric">
+        <id column="id" property="id" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="dissipation" property="dissipation" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="call_times" property="callTimes" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, 
+        specification, 
+        manufactor, 
+        dissipation, 
+        comments, 
+        is_del AS isDel, 
+        create_time AS createTime, 
+        create_user AS createUser, 
+        modify_time AS modifyTime, 
+        modify_user AS modifyUser, 
+        org_id AS orgId, 
+        call_times AS callTimes
+    </sql>
+    
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.specification AS ${alias}_specification,
+        ${alias}.manufactor AS ${alias}_manufactor,
+        ${alias}.dissipation AS ${alias}_dissipation,
+        ${alias}.comments AS ${alias}_comments,
+        ${alias}.org_id AS ${alias}_org_id,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+        ${alias}.call_times AS ${alias}_call_times
+    </sql>
+    
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.specification,
+        ${alias}.manufactor,
+        ${alias}.dissipation,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+        ${alias}.call_times
+    </sql>
+    
+    <!--条件分页查询-->
+    <select id="selectPageList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Column_List">
+            <property name="alias" value="a" />
+        </include>
+        from t_project_target_set_electric a
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.id desc
+    </select>
+
+    <!--根据制造厂商和规格型号判重-->
+    <select id="checkBySpecificationAndManufactor" resultType="int" >
+        SELECT
+        count(*)
+        from t_project_target_set_electric
+        where specification=#{e.body.specification}
+        and manufactor=#{e.body.manufactor}
+        <if test="e.body.id!=null and e.body.id!=''">
+            and id!=#{e.body.id}
+        </if>
+    </select>
+
+</mapper>

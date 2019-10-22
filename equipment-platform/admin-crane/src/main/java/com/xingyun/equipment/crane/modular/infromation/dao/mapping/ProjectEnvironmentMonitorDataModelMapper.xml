@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.infromation.dao.ProjectEnvironmentMonitorDataModelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.infromation.model.ProjectEnvironmentMonitorDataModel">
+        <id column="id" property="id" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="pm10" property="pm10" />
+        <result column="pm25" property="pm25" />
+        <result column="noise" property="noise" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="wind_direction" property="windDirection" />
+        <result column="temperature" property="temperature" />
+        <result column="humidity" property="humidity" />
+        <result column="tsp" property="tsp" />
+        <result column="wind_force" property="windForce" />
+        <result column="atmospheric" property="atmospheric" />
+        <result column="status" property="status" />
+        <result column="key1" property="key1" />
+        <result column="key2" property="key2" />
+        <result column="key3" property="key3" />
+        <result column="key4" property="key4" />
+        <result column="key5" property="key5" />
+        <result column="key6" property="key6" />
+        <result column="key7" property="key7" />
+        <result column="key8" property="key8" />
+        <result column="key9" property="key9" />
+        <result column="key10" property="key10" />
+        <result column="alarm" property="alarm" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="device_no" property="deviceNo" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, specification, manufactor,alarm, pm10, pm25, noise, wind_speed AS windSpeed, wind_direction AS windDirection, temperature, humidity, tsp, wind_force AS windForce, atmospheric, status, key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, device_no AS deviceNo
+    </sql>
+
+
+    <select id="selectByName" resultMap="BaseResultMap">
+        select
+        id, specification, manufactor,alarm, pm10, pm25, noise, wind_speed AS windSpeed, wind_direction AS windDirection, temperature, humidity, tsp, wind_force AS windForce, atmospheric, status, key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, device_no AS deviceNo
+        from t_project_environment_monitor_data_model
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+</mapper>

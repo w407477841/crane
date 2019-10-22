@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.spray.dao.ProjectSprayBindMapper">
+
+    <select id="getListProjectSprayBind" resultType="com.xywg.equipment.monitor.iot.modular.spray.model.ProjectSpray">
+		select
+		s.id,
+		b.project_id as projectId ,
+		s.device_no as  deviceNo,
+		s.pm10 as pm10,
+		s.pm25 as pm25
+		FROM  t_project_spray_bind b
+		LEFT JOIN  t_project_spray  s on b.spray_id= s.id and  s.is_del=0
+		where b.environment_id =#{environmentId}  and  b.is_del=0
+
+	</select>
+
+
+</mapper>

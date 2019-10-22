@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.dlt.dao.ProjectElectricPowerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.dlt.model.ProjectElectricPower">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="device_no" property="deviceNo" />
+        <result column="collecter_no" property="collecterNo" />
+        <result column="type" property="type" />
+        <result column="project_id" property="projectId" />
+        <result column="gprs" property="gprs" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="dissipation" property="dissipation" />
+        <result column="is_online" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="place_point" property="placePoint" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, device_no AS deviceNo, collecter_no AS collecterNo,type, project_id AS projectId, gprs, specification, manufactor, dissipation, is_online AS isOnline, status, place_point AS placePoint, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+
+</mapper>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.whf.dao.ProjectLiftDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectLiftDetail">
+        <id column="id" property="id" />
+        <result column="lift_id" property="liftId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="driver" property="driver" />
+        <result column="device_time" property="deviceTime" />
+        <result column="weight" property="weight" />
+        <result column="height" property="height" />
+        <result column="speed" property="speed" />
+        <result column="people" property="people" />
+        <result column="front_door_status" property="frontDoorStatus" />
+        <result column="back_door_status" property="backDoorStatus" />
+        <result column="status" property="status" />
+        <result column="tilt_angle" property="tiltAngle" />
+        <result column="floor" property="floor" />
+        <result column="floor_start" property="floorStart" />
+        <result column="floor_end" property="floorEnd" />
+        <result column="key1" property="key1" />
+        <result column="key2" property="key2" />
+        <result column="key3" property="key3" />
+        <result column="key4" property="key4" />
+        <result column="key5" property="key5" />
+        <result column="key6" property="key6" />
+        <result column="key7" property="key7" />
+        <result column="key8" property="key8" />
+        <result column="key9" property="key9" />
+        <result column="key10" property="key10" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, lift_id AS liftId, device_no AS deviceNo, driver, device_time AS deviceTime, weight, height, speed, people, front_door_status AS frontDoorStatus, back_door_status AS backDoorStatus, status, tilt_angle AS tiltAngle, floor, floor_start AS floorStart, floor_end AS floorEnd, key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <insert id="createDetail" useGeneratedKeys="true" keyProperty="t.id" >
+        insert into ${tableName} (
+        is_del,create_time
+        <if test="t.id!=null">
+            ,id
+        </if>
+
+        <if test="t.liftId!=null">
+            ,lift_id
+        </if>
+
+        <if test="t.deviceNo!=null">
+            ,device_no
+        </if>
+
+        <if test="t.driver!=null">
+            ,driver
+        </if>
+
+
+            ,device_time
+
+
+        <if test="t.weight!=null">
+            ,weight
+        </if>
+
+        <if test="t.height!=null">
+            ,height
+        </if>
+
+        <if test="t.speed!=null">
+            ,speed
+        </if>
+
+        <if test="t.people!=null">
+            ,people
+        </if>
+
+        <if test="t.frontDoorStatus!=null">
+            ,front_door_status
+        </if>
+
+        <if test="t.backDoorStatus!=null">
+            ,back_door_status
+        </if>
+
+
+            ,status
+
+
+        <if test="t.key1!=null">
+            ,key1
+        </if>
+
+        <if test="t.key2!=null">
+            ,key2
+        </if>
+
+        <if test="t.key3!=null">
+            ,key3
+        </if>
+
+        <if test="t.key4!=null">
+            ,key4
+        </if>
+
+        <if test="t.key5!=null">
+            ,key5
+        </if>
+
+        <if test="t.key6!=null">
+            ,key6
+        </if>
+
+        <if test="t.key7!=null">
+            ,key7
+        </if>
+
+        <if test="t.key8!=null">
+            ,key8
+        </if>
+
+        <if test="t.key9!=null">
+            ,key9
+        </if>
+
+        <if test="t.key10!=null">
+            ,key10
+        </if>
+
+        <if test="t.createUser!=null">
+            ,create_user
+        </if>
+
+        <if test="t.modifyTime!=null">
+            ,modify_time
+        </if>
+
+        <if test="t.modifyUser!=null">
+            ,modify_user
+        </if>
+
+        )
+        values (
+        0,DATE_FORMAT(#{t.createTime},'%Y-%m-%d %T')
+        <if test="t.id!=null">
+            ,#{t.id}
+        </if>
+        <if test="t.liftId!=null">
+            ,#{t.liftId}
+        </if>
+        <if test="t.deviceNo!=null">
+            ,#{t.deviceNo}
+        </if>
+        <if test="t.driver!=null">
+            ,#{t.driver}
+        </if>
+
+            ,DATE_FORMAT(#{t.deviceTime},'%Y-%m-%d %T')
+
+        <if test="t.weight!=null">
+            ,#{t.weight}
+        </if>
+        <if test="t.height!=null">
+            ,#{t.height}
+        </if>
+        <if test="t.speed!=null">
+            ,#{t.speed}
+        </if>
+        <if test="t.people!=null">
+            ,#{t.people}
+        </if>
+        <if test="t.frontDoorStatus!=null">
+            ,#{t.frontDoorStatus}
+        </if>
+        <if test="t.backDoorStatus!=null">
+            ,#{t.backDoorStatus}
+        </if>
+
+            ,1
+
+        <if test="t.key1!=null">
+            ,#{t.key1}
+        </if>
+        <if test="t.key2!=null">
+            ,#{t.key2}
+        </if>
+        <if test="t.key3!=null">
+            ,#{t.key3}
+        </if>
+        <if test="t.key4!=null">
+            ,#{t.key4}
+        </if>
+        <if test="t.key5!=null">
+            ,#{t.key5}
+        </if>
+        <if test="t.key6!=null">
+            ,#{t.key6}
+        </if>
+        <if test="t.key7!=null">
+            ,#{t.key7}
+        </if>
+        <if test="t.key8!=null">
+            ,#{t.key8}
+        </if>
+        <if test="t.key9!=null">
+            ,#{t.key9}
+        </if>
+        <if test="t.key10!=null">
+            ,#{t.key10}
+        </if>
+        <if test="t.createUser!=null">
+            ,#{t.createUser}
+        </if>
+        <if test="t.modifyTime!=null">
+            ,#{t.modifyTime}
+        </if>
+        <if test="t.modifyUser!=null">
+            ,#{t.modifyUser}
+        </if>
+        )
+    </insert>
+
+</mapper>

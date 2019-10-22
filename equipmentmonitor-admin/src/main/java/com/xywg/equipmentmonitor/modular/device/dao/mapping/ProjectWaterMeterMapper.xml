@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.device.dao.ProjectWaterMeterMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.device.model.ProjectWaterMeter">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="device_no" property="deviceNo" />
+        <result column="collecter_no" property="collecterNo" />
+        <result column="type" property="type" />
+        <result column="device_type" property="deviceType" />
+        <result column="project_id" property="projectId" />
+        <result column="gprs" property="gprs" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="dissipation" property="dissipation" />
+        <result column="is_online" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="is_online_collecter" property="isOnlineCollecter" />
+        <result column="place_point" property="placePoint" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+    <resultMap id="deviceSumMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterDeviceSumVo" >
+        <result column="all" property="all" />
+        <result column="normal" property="normal" />
+        <result column="discontinuation" property="discontinuation" />
+        <result column="abnormal" property="abnormal" />
+        <result column="gprs" property="gprs" />
+    </resultMap>
+    <resultMap id="pieDataMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterPieDataVo" >
+        <result column="name" property="name" />
+        <result column="amount" property="amount" />
+    </resultMap>
+      <resultMap id="lineDataMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterLineDataVo" >
+        <result column="name" property="name" />
+        <result column="amount" property="amount" />
+    </resultMap>
+    <resultMap id="useDataMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterUseDataVo" >
+        <result column="all" property="all" />
+        <result column="hb" property="hb" />
+    </resultMap>
+     <resultMap id="otherResultMap" type="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterInfoVo"
+               extends="BaseResultMap">
+        <result column="project_name" property="projectName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, device_no AS deviceNo, collecter_no AS collecterNo, type, device_type AS deviceType, project_id AS projectId, gprs, specification, manufactor, dissipation, is_online AS isOnline, status, is_online_collecter AS isOnlineCollecter, place_point AS placePoint, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId
+    </sql>
+     
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.name,
+        ${alias}.device_no,
+        ${alias}.collecter_no,
+        ${alias}.type,
+        ${alias}.project_id,
+        ${alias}.gprs, 
+        ${alias}.specification, 
+        ${alias}.manufactor,
+        ${alias}.dissipation,
+        ${alias}.is_online,
+        ${alias}.status,
+        ${alias}.place_point,
+        ${alias}.comments,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+    </sql>
+
+    <select id="selectWaterData" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterVo">
+        SELECT
+        wm.id,wm.device_no AS deviceNo,wm.project_id AS projectId,pi.name AS projectName,wm.is_online AS status,wm.manufactor
+        FROM
+        t_project_water_meter wm
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = wm.project_id
+        WHERE wm.is_del = 0 AND wm.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="key != null and key != ''">
+            AND wm.project_id = #{key}
+        </if>
+        <if test="deviceNo!=null and deviceNo !=''">
+            AND wm.device_no like #{deviceNo}
+        </if>
+        <if test="status != null and status != ''">
+            AND wm.is_online = #{status}
+        </if>
+        ORDER BY wm.create_time DESC 
+    </select>
+
+    <select id="selectMonitorStatus" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterHeartbeatVo">
+        SELECT
+        wmh.id,wmh.electric_id AS electricId,wmh.status,wmh.end_time AS deviceTimeEnd,wmh.comments,wmh.create_time AS deviceTimeBegin
+        FROM
+        t_project_water_meter_heartbeat wmh
+        WHERE wmh.is_del = 0 AND wmh.electric_id = #{electricId}
+        <if test="begin != null and begin != ''">
+            AND date_format(wmh.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(wmh.create_time,'%Y-%m-%d')
+        </if>
+        ORDER BY wmh.create_time DESC
+    </select>
+
+    <select id="selectRunData" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectWaterMeterDetail">
+        SELECT
+        wmd.id,wmd.electric_id AS electricId,wmd.current_degree AS currentDegree,wmd.device_time AS deviceTime,wmd.comments,wmd.status
+        FROM
+        ${tableName} wmd
+        WHERE wmd.is_del = 0 AND wmd.electric_id = #{electricId}
+        <if test="begin != null and begin != ''">
+            AND date_format(wmd.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(wmd.create_time,'%Y-%m-%d')
+        </if>
+        ORDER BY wmd.create_time DESC
+    </select>
+
+    <select id="selectWarningAlarm" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterAlarmVo">
+        SELECT
+        COUNT(id) AS alarmDissipation
+        FROM
+        ${tableName} wma
+        WHERE wma.is_del = 0 AND wma.alarm_id = 1 AND wma.electric_id = #{electricId}
+        <if test="begin != null and begin != ''">
+            AND date_format(wma.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(wma.create_time,'%Y-%m-%d')
+        </if>
+    </select>
+
+    <select id="selectAlarmData" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.model.ProjectWaterMeterAlarm">
+        SELECT
+        wma.id,wma.alarm_info AS alarmInfo,wma.create_time AS alarmTime
+        FROM
+        ${tableName} wma
+        WHERE wma.is_del = 0 AND wma.alarm_id = 1 AND wma.electric_id = #{electricId}
+        <if test="begin != null and begin != ''">
+            AND date_format(wma.create_time,'%Y-%m-%d') >= #{begin}
+        </if>
+        <if test="end != null and end != ''">
+            AND #{end} >= date_format(wma.create_time,'%Y-%m-%d')
+        </if>
+        ORDER BY wma.create_time DESC
+    </select>
+    
+    <select id="selectDeviceSum" resultMap="deviceSumMap">
+    SELECT count(status) as count,status from t_project_water_meter GROUP BY status
+    where is_del =0
+    and org_id =#{orgId}
+    
+    </select>
+      <select id="selectLineData" resultMap="lineDataMap">
+      select ifnull( sum(t.degeree) , 0 ) as amount from (select max(a.current_degree) as degeree from  ${tableName} as a
+      left join t_project_water_meter as b on a.electric_id = b.id 
+      where  
+      a.device_time like  concat(#{yearMonth},'%')
+<!--       <if test="orgIds.size() >0">
+            and 
+      b.org_id in 
+      <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+      </foreach>
+      </if> -->
+ 
+        
+      GROUP BY a.electric_id   )t
+      
+    
+    </select>
+      <select id="selectPieData" resultMap="pieDataMap">
+    
+    
+    </select>
+     <select id="selectUseData" resultMap="useDataMap">
+        select max(current_degree) - min(current_degree)  from ${tableName}
+        where is_del =0 
+        and electric_id =${id}
+    </select>
+    <!--分页管理  -->
+    <select id="selectPageList" resultMap="otherResultMap">
+        select
+        <include refid="Column_List">
+            <property name="alias" value="a"/>
+        </include>
+        CASE a.is_online WHEN 1 THEN '在线' ELSE '离线' END as statusName,
+        b.name as project_name,
+        c.name as createUserName
+        from t_project_water_meter a
+        left join t_project_info b on b.id = a.project_id and b.is_del = 0
+        left join t_sys_user c on c.id = a.create_user
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        order by a.create_time desc
+    </select>
+    <select id="getAmountByDays1" resultType="java.math.BigDecimal" >
+    select ifnull(((select sum(a.count) from (select max(t1.current_degree) as count from (select * from t_project_water_meter_detail_${month2}
+    where DATE_FORMAT(device_time, '%Y-%m-%d') = #{day2} and electric_id in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    ) t1 group by t1.electric_id
+    
+    ) a) -(select sum(b.count) from (select max(t2.current_degree) as count from (select * from t_project_water_meter_detail_${month1}
+    where DATE_FORMAT(device_time, '%Y-%m-%d') = #{day1} and electric_id in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    ) t2 group by t2.electric_id
+    
+    ) b)),0)
+    </select>
+    
+    <select id="getAmountByDevice1" resultType="java.math.BigDecimal">
+    select ifnull(((select max(t1.current_degree) as count from (select * from t_project_water_meter_detail_${month2}
+    where DATE_FORMAT(device_time, '%Y-%m-%d') = #{day2} and electric_id =#{electricId}
+    ) t1) -(select max(t2.current_degree) as count from (select * from t_project_water_meter_detail_${month1}
+    where DATE_FORMAT(device_time, '%Y-%m-%d') = #{day1} and electric_id =#{electricId}
+    ) t2 )),0)
+    </select>
+    
+   
+
+    
+    <select id="getAmountByMonth1" resultType="java.math.BigDecimal" >
+    select ifnull(((select sum(a.count) from (select max(t1.current_degree) as count from (select * from t_project_water_meter_detail_${month2}
+    where  electric_id in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    ) t1 group by t1.electric_id
+    
+    ) a) -(select sum(b.count) from (select max(t2.current_degree) as count from (select * from t_project_water_meter_detail_${month1}
+    where  electric_id in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    ) t2 group by t2.electric_id
+    
+    ) b)),0)
+    </select>
+    
+    
+     <select id="getAmountByDevice" resultType="java.math.BigDecimal">
+       select IFNULL(SUM(amount_used),0)  from t_project_water_daily where statistics_date  BETWEEN ${beginDay} and ${endDay}
+       and device_id  = #{id}
+    </select>
+    <select id="getAmountByMonth" resultType="java.math.BigDecimal">
+       select IFNULL(SUM(amount_used),0)  from t_project_water_daily where statistics_date like #{statisticsDate}
+     <if test="ids.size >0">
+       and device_id  in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    </if>
+    
+    </select>
+    
+     <select id="getAmountByDays" resultType="java.math.BigDecimal">
+       select IFNULL(SUM(amount_used),0)  from t_project_water_daily where statistics_date  
+       BETWEEN ${beginDay} and ${endDay}
+       <if test="ids.size >0">
+            and device_id  in 
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+       </if>
+  
+    </select>
+
+    <select id="selectWater" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterVo">
+        SELECT
+        wm.id,wm.name,wm.device_no AS deviceNo,wm.collecter_no AS collecterNo,wm.type,wm.device_type AS deviceType,
+        wm.project_id AS projectId,wm.gprs,tsw.specification,wm.manufactor,wm.dissipation,wm.is_online AS isOnline,wm.status,
+        wm.is_online_collecter AS isOnlineCollecter,wm.place_point AS placePoint,wm.comments,wm.create_time AS createTime,
+        wm.create_user AS createUser,pi.name AS projectName,u.name AS createUserName,wm.ratio
+        FROM
+        t_project_water_meter wm
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = wm.project_id
+        LEFT JOIN
+        t_sys_user u
+        ON u.id = wm.create_user
+        LEFT JOIN
+        t_project_target_set_water tsw
+        ON tsw.id = wm.specification
+        WHERE wm.is_del = 0 AND wm.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="key != '' and key != null">
+            AND wm.project_id = #{key}
+        </if>
+        <if test="device_no != '' and device_no != null">
+            AND wm.device_no like #{device_no}
+        </if>
+        ORDER BY wm.create_time DESC
+    </select>
+
+    <select id="selectWaterList" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterVo">
+        SELECT
+        wm.id,wm.name,wm.device_no AS deviceNo,wm.collecter_no AS collecterNo,wm.type,wm.device_type AS deviceType,
+        wm.project_id AS projectId,wm.gprs,wm.specification,wm.manufactor,wm.dissipation,wm.is_online AS isOnline,wm.status,
+        wm.is_online_collecter AS isOnlineCollecter,wm.place_point AS placePoint,wm.comments,wm.create_time AS createTime,
+        wm.create_user AS createUser,pi.name AS projectName,u.name AS createUserName,
+        CASE wm.is_online WHEN 1 THEN '在线' ELSE '离线'END AS statusName
+        FROM t_project_water_meter wm
+        LEFT JOIN t_project_info pi
+        ON pi.id = wm.project_id AND pi.is_del = 0
+        LEFT JOIN t_sys_user u
+        ON u.id = wm.create_user
+        WHERE wm.is_del = 0 AND wm.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        ORDER BY wm.create_time DESC
+    </select>
+    
+   <select id="getWaterDetailInfo" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.device.vo.ProjectWaterMeterVo">
+   <!--  select tmp.currentDegree,tmp.deviceTime,
+   currentDegree-ifnull((select t1.currentDegree 
+   			from (
+  ( select max(pcd.current_degree) as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_water_meter pc left join  ${tableName}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc )
+union all
+(select pcd.current_degree as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_water_meter pc left join  ${tableName1}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+ and DATE_FORMAT(pcd.device_time,'%Y-%m-%d') >= #{lastMonthDay}
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc limit 1) order by deviceTime desc
+
+) t1 where t1.electricId = tmp.electricId and  t1.deviceTime &lt; tmp.deviceTime limit 1),0) as waterQuantity
+   from(
+  ( select max(pcd.current_degree) as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_water_meter pc left join  ${tableName}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc )
+union all
+(select pcd.current_degree as currentDegree,DATE_FORMAT(pcd.device_time,'%Y-%m-%d') as deviceTime,electric_id as electricId 
+   from t_project_water_meter pc left join  ${tableName1}  pcd  on pcd.electric_id = pc.id
+   
+   left join 
+   t_project_info pi
+  ON pi.id = pc.project_id
+ where pc.is_del = 0
+ and pcd.device_time is not null
+ and DATE_FORMAT(pcd.device_time,'%Y-%m-%d') >= #{lastMonthDay} 
+ and pc.device_no = #{deviceNo} and pi.uuid = #{uuid}
+   group  by DATE_FORMAT(pcd.device_time,
+                '%Y-%m-%d'),pcd.electric_id order by pcd.device_time desc limit 1) order by deviceTime desc
+
+) tmp where tmp.deviceTime >= #{fristDay} -->
+
+select pc.degree as currentDegree,pc.statistics_date as deviceTime,
+    pc.amount_used as waterQuantity 
+    from  t_project_water_meter pcd
+    left join t_project_water_daily pc
+    on pcd.id = pc.device_id and pc.statistics_date >=#{fristDay}
+    inner join t_project_info pi
+    ON pi.id = pcd.project_id and pi.uuid =#{uuid} and pcd.device_no = #{deviceNo}
+   
+    order by pc.statistics_date desc
+    </select>
+    
+    <select id="getAlarmInfo" parameterType="java.util.Map"
+            resultType="com.xywg.equipmentmonitor.modular.device.vo.WaterAlarmVO">
+        SELECT
+        pca.alarm_id AS alarmId,pi.name AS projectName,pi.uuid,pc.device_no AS deviceNo,pca.alarm_info AS
+        info,COUNT(pca.id) AS amount
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_water_meter pc
+        ON pc.id = pca.electric_id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        WHERE pca.is_del = 0 and pc.is_del =0 AND pi.uuid IN
+        <foreach collection="uuids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="deviceNo != null and deviceNo != ''">
+            AND pc.device_no = #{deviceNo}
+        </if>
+        <if test="alarmId != null and alarmId != ''">
+            AND pca.alarm_id = #{alarmId}
+        </if>
+        GROUP BY pc.device_no,pca.alarm_info
+
+    </select>
+
+    <select id="getAlarmDetail" parameterType="java.util.Map"
+            resultType="com.xywg.equipmentmonitor.modular.device.vo.WaterAlarmVO">
+       SELECT
+        pca.id,pca.create_time AS deviceTime,pca.alarm_info AS info,
+        if(pca.status =1 ,'已处理','未处理') status,
+
+        pca.modify_user_name as userName,pca.modify_time as modifyTime
+        FROM
+        ${tableName} pca
+        LEFT JOIN
+        t_project_water_meter pc
+        ON pc.id = pca.electric_id
+        LEFT JOIN
+        t_project_info pi
+        ON pi.id = pc.project_id
+        left join t_sys_user u
+        on u.id = pca.modify_user
+        WHERE pca.is_del = 0 and pc.is_del =0
+        AND pca.alarm_id = #{alarmId}
+        <if test="deviceNo != null and deviceNo != ''">
+            AND pc.device_no = #{deviceNo}
+        </if>
+        order by pca.create_time desc
+    </select>
+    
+    
+    <select id="selectAbnormal" resultType="java.lang.Integer">
+    select COUNT(DISTINCT electric_id)
+    from 
+	t_project_water_meter_alarm_${month} b 
+    LEFT JOIN  t_project_water_meter a
+    on  a.id = b.electric_id
+    where a.id in
+    <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+    </foreach>
+    </select>
+</mapper>

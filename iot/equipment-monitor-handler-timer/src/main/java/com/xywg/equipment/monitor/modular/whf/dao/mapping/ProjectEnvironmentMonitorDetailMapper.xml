@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.modular.whf.dao.ProjectEnvironmentMonitorDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectEnvironmentMonitorDetail">
+        <id column="id" property="id" />
+        <result column="monitor_id" property="monitorId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="pm10" property="pm10" />
+        <result column="pm25" property="pm25" />
+        <result column="noise" property="noise" />
+        <result column="wind_speed" property="windSpeed" />
+        <result column="wind_direction" property="windDirection" />
+        <result column="temperature" property="temperature" />
+        <result column="humidity" property="humidity" />
+        <result column="tsp" property="tsp" />
+        <result column="wind_force" property="windForce" />
+        <result column="atmospheric" property="atmospheric" />
+        <result column="status" property="status" />
+        <result column="key1" property="key1" />
+        <result column="key2" property="key2" />
+        <result column="key3" property="key3" />
+        <result column="key4" property="key4" />
+        <result column="key5" property="key5" />
+        <result column="key6" property="key6" />
+        <result column="key7" property="key7" />
+        <result column="key8" property="key8" />
+        <result column="key9" property="key9" />
+        <result column="key10" property="key10" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, monitor_id AS monitorId, device_no AS deviceNo, pm10, pm25, noise, wind_speed AS windSpeed, wind_direction AS windDirection, temperature, humidity, tsp, wind_force AS windForce, atmospheric, status, key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+    <insert id="createDetail" useGeneratedKeys="true" keyProperty="t.id" >
+        insert into ${tableName} (
+        is_del,create_time,device_time
+        <if test="t.id!=null">
+            ,id
+        </if>
+
+        <if test="t.monitorId!=null">
+            ,monitor_id
+        </if>
+
+        <if test="t.deviceNo!=null">
+            ,device_no
+        </if>
+
+        <if test="t.pm10!=null">
+            ,pm10
+        </if>
+
+        <if test="t.pm25!=null">
+            ,pm25
+        </if>
+
+        <if test="t.noise!=null">
+            ,noise
+        </if>
+
+        <if test="t.windSpeed!=null">
+            ,wind_speed
+        </if>
+
+        <if test="t.windDirection!=null">
+            ,wind_direction
+        </if>
+
+        <if test="t.temperature!=null">
+            ,temperature
+        </if>
+
+        <if test="t.humidity!=null">
+            ,humidity
+        </if>
+
+        <if test="t.tsp!=null">
+            ,tsp
+        </if>
+
+        <if test="t.windForce!=null">
+            ,wind_force
+        </if>
+
+        <if test="t.atmospheric!=null">
+            ,atmospheric
+        </if>
+
+
+            ,status
+
+
+        <if test="t.key1!=null">
+            ,key1
+        </if>
+
+        <if test="t.key2!=null">
+            ,key2
+        </if>
+
+        <if test="t.key3!=null">
+            ,key3
+        </if>
+
+        <if test="t.key4!=null">
+            ,key4
+        </if>
+
+        <if test="t.key5!=null">
+            ,key5
+        </if>
+
+        <if test="t.key6!=null">
+            ,key6
+        </if>
+
+        <if test="t.key7!=null">
+            ,key7
+        </if>
+
+        <if test="t.key8!=null">
+            ,key8
+        </if>
+
+        <if test="t.key9!=null">
+            ,key9
+        </if>
+
+        <if test="t.key10!=null">
+            ,key10
+        </if>
+
+        <if test="t.createUser!=null">
+            ,create_user
+        </if>
+
+        <if test="t.modifyTime!=null">
+            ,modify_time
+        </if>
+
+        <if test="t.modifyUser!=null">
+            ,modify_user
+        </if>
+
+        )
+        values (
+        0,DATE_FORMAT(now(),'%Y-%m-%d %T'),DATE_FORMAT(now(),'%Y-%m-%d %T')
+        <if test="t.id!=null">
+            ,#{t.id}
+        </if>
+        <if test="t.monitorId!=null">
+            ,#{t.monitorId}
+        </if>
+        <if test="t.deviceNo!=null">
+            ,#{t.deviceNo}
+        </if>
+        <if test="t.pm10!=null">
+            ,#{t.pm10}
+        </if>
+        <if test="t.pm25!=null">
+            ,#{t.pm25}
+        </if>
+        <if test="t.noise!=null">
+            ,#{t.noise}
+        </if>
+        <if test="t.windSpeed!=null">
+            ,#{t.windSpeed}
+        </if>
+        <if test="t.windDirection!=null">
+            ,#{t.windDirection}
+        </if>
+        <if test="t.temperature!=null">
+            ,#{t.temperature}
+        </if>
+        <if test="t.humidity!=null">
+            ,#{t.humidity}
+        </if>
+        <if test="t.tsp!=null">
+            ,#{t.tsp}
+        </if>
+        <if test="t.windForce!=null">
+            ,#{t.windForce}
+        </if>
+        <if test="t.atmospheric!=null">
+            ,#{t.atmospheric}
+        </if>
+
+            ,1
+
+        <if test="t.key1!=null">
+            ,#{t.key1}
+        </if>
+        <if test="t.key2!=null">
+            ,#{t.key2}
+        </if>
+        <if test="t.key3!=null">
+            ,#{t.key3}
+        </if>
+        <if test="t.key4!=null">
+            ,#{t.key4}
+        </if>
+        <if test="t.key5!=null">
+            ,#{t.key5}
+        </if>
+        <if test="t.key6!=null">
+            ,#{t.key6}
+        </if>
+        <if test="t.key7!=null">
+            ,#{t.key7}
+        </if>
+        <if test="t.key8!=null">
+            ,#{t.key8}
+        </if>
+        <if test="t.key9!=null">
+            ,#{t.key9}
+        </if>
+        <if test="t.key10!=null">
+            ,#{t.key10}
+        </if>
+        <if test="t.createUser!=null">
+            ,#{t.createUser}
+        </if>
+        <if test="t.modifyTime!=null">
+            ,#{t.modifyTime}
+        </if>
+        <if test="t.modifyUser!=null">
+            ,#{t.modifyUser}
+        </if>
+        )
+    </insert>
+
+
+</mapper>

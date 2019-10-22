@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.unload.dao.ProjectUnloadMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.modular.whf.model.ProjectUnload">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="device_no" property="deviceNo" />
+        <result column="identifier" property="identifier" />
+        <result column="specification" property="specification" />
+        <result column="owner" property="owner" />
+        <result column="manufactor" property="manufactor" />
+        <result column="max_weight" property="maxWeight" />
+        <result column="max_tilt_angle1" property="maxTiltAngle1" />
+        <result column="min_tilt_angle1" property="minTiltAngle1" />
+        <result column="max_tilt_angle2" property="maxTiltAngle2" />
+        <result column="min_tilt_angle2" property="minTiltAngle2" />
+        <result column="is_online" property="isOnline" />
+        <result column="status" property="status" />
+        <result column="place_point" property="placePoint" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="gprs" property="gprs" />
+        <result column="firmware_version" property="firmwareVersion" />
+        <result column="upgrade_time" property="upgradeTime" />
+        <result column="unload_no" property="unloadNo" />
+        <result column="multiple" property="multiple" />
+        <result column="name" property="name" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, device_no AS deviceNo, identifier, specification, owner, manufactor, max_weight AS maxWeight, max_tilt_angle1 AS maxTiltAngle1, min_tilt_angle1 AS minTiltAngle1, max_tilt_angle2 AS maxTiltAngle2, min_tilt_angle2 AS minTiltAngle2, is_online AS isOnline, status, place_point AS placePoint, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId, gprs, firmware_version AS firmwareVersion, upgrade_time AS upgradeTime, unload_no AS unloadNo, multiple, name
+    </sql>
+
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipmentmonitor.modular.infromation.dao.ProjectTargetSetWaterMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipmentmonitor.modular.infromation.model.ProjectTargetSetWater">
+        <id column="id" property="id" />
+        <result column="specification" property="specification" />
+        <result column="manufactor" property="manufactor" />
+        <result column="dissipation" property="dissipation" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+        <result column="call_times" property="callTimes" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, specification, manufactor, dissipation, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser, org_id AS orgId, call_times AS callTimes
+    </sql>
+
+    <select id="selectTargetSetWater" parameterType="java.util.Map" resultType="com.xywg.equipmentmonitor.modular.infromation.model.ProjectTargetSetWater">
+        SELECT
+        tsw.id,tsw.specification,tsw.manufactor,tsw.dissipation,tsw.comments,tsw.create_time AS createTime,
+        tsw.create_user AS createUser,tsw.call_times AS callTimes
+        FROM
+        t_project_target_set_water tsw
+        WHERE tsw.is_del = 0 AND tsw.org_id IN
+        <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="key != null and key != ''">
+            AND tsw.specification LIKE concat('%',#{key},'%')
+        </if>
+        ORDER BY tsw.create_time DESC
+    </select>
+
+    <!--占用-->
+    <update id="plusCallTimes" parameterType="java.util.Map">
+        update t_project_target_set_water
+        set call_times=ifnull(call_times,0) +1
+        where id =#{specification}
+        and manufactor =#{manufactor}
+    </update>
+
+    <!--删除占用-->
+    <update id="minusCallTimes" parameterType="com.xywg.equipmentmonitor.modular.device.model.ProjectWaterMeter">
+        <foreach collection="list" index="index" item="item" open="" close="" separator=";">
+            update t_project_target_set_water
+            set call_times=ifnull(call_times,0) -1
+            where id =#{item.specification}
+            and manufactor =#{item.manufactor}
+        </foreach>
+    </update>
+</mapper>

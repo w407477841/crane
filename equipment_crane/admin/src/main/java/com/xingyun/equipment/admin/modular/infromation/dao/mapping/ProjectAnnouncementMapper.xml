@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.admin.modular.infromation.dao.ProjectAnnouncementMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.admin.modular.infromation.model.ProjectAnnouncement">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="status" property="status" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+     <!-- 通用查询映射结果 -->
+    <resultMap id="BaseFileResultMap" type="com.xingyun.equipment.admin.modular.infromation.model.ProjectAnnouncementFile">
+        <id column="id" property="id" />
+        <result column="announcement_id" property="announcementId" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="size" property="size" />
+        <result column="author" property="author" />
+        <result column="path" property="path" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+    
+     <resultMap id ="nowResultMap" type="com.xingyun.equipment.admin.modular.infromation.vo.ProjectAnnouncementVO" extends="BaseResultMap">
+	 	<result column="createUserName" property="createUserName" />
+	 	<result column="orgName" property="orgName" />
+	</resultMap>
+ <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        code,
+        title,
+        content,
+        status,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+        org_id,
+    </sql>
+     <sql id="Base_File_Column_List">
+        id,
+        announcement_id,
+        code,
+        name,
+        type,
+        size,
+        author,
+        path,
+        comments,
+        is_del,
+        create_time,
+        create_user,
+        modify_time,
+        modify_user,
+        org_id
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.code AS ${alias}_code,
+        ${alias}.title AS ${alias}_title,
+        ${alias}.content AS ${alias}_content,
+        ${alias}.status AS ${alias}_status,
+        ${alias}.org_id AS ${alias}_org_id,
+        ${alias}.is_del AS ${alias}_is_del,
+        ${alias}.create_time AS ${alias}_create_time,
+        ${alias}.create_user AS ${alias}_create_user,
+        ${alias}.modify_time AS ${alias}_modify_time,
+        ${alias}.modify_user AS ${alias}_modify_user,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.code,
+        ${alias}.title,
+        ${alias}.content,
+        ${alias}.status,
+        ${alias}.org_id,
+        ${alias}.is_del,
+        ${alias}.create_time,
+        ${alias}.create_user,
+        ${alias}.modify_time,
+        ${alias}.modify_user,
+    </sql>
+
+
+   <!--查询列表  -->
+    <select id="selectPageList" resultMap="nowResultMap">
+    select
+    <include refid="Column_List">
+		<property name="alias" value="a" />
+	</include>
+	m.name as orgName,n.name as createUserName
+	from t_project_announcement a
+	left join t_sys_organization m on a.org_id = m.id
+	left join t_sys_user n on a.create_user = n.id
+	where a.is_del = 0
+	
+    order by a.create_time desc
+
+    </select>
+    <!-- 新增 -->
+    <insert id="insertProjectAnnouncement" parameterType="com.xingyun.equipment.admin.modular.infromation.model.ProjectAnnouncement" keyProperty="id" >
+   <selectKey keyProperty='id' resultType='int' order='AFTER'  >  
+        select LAST_INSERT_ID();  
+    </selectKey>  
+
+     insert into t_project_announcement 
+  (      
+     code,
+     title,
+     content,
+     status,
+     is_del,
+     create_time,
+     create_user,
+     org_id
+      
+  )values(
+    #{code},
+    #{title},
+    #{content},
+    0,
+    0,
+    now(),
+    #{createUser},
+    #{orgId}
+  )</insert>
+  <!-- 新增文件 -->
+      <insert id="insertProjectAnnouncementFile" parameterType="com.xingyun.equipment.admin.modular.infromation.model.ProjectAnnouncementFile" >
+     insert into t_project_announcement_file 
+  (      
+        announcement_id,
+        code,
+        name,
+        type,
+        size,
+        author,
+        path,
+        comments,
+        is_del,
+        create_time,
+        create_user,
+        org_id
+      
+  )values(
+    #{announcementId},
+    #{code},
+    #{name},
+    #{type},
+    #{size},
+    #{author},
+    #{path},
+    #{comments},
+    0,
+    now(),
+    #{createUser},
+    #{orgId}
+  )</insert>
+  <!-- 编辑 -->
+ <update id="updateProjectAnnouncement" parameterType="com.xingyun.equipment.admin.modular.infromation.model.ProjectAnnouncement"  >
+     update  t_project_announcement 
+     set
+     
+     title = #{title},
+     content = #{content},
+     modify_time = now(),
+     modify_user = #{modifyUser}
+     where id = #{id}
+</update>
+<!-- 删除文件 -->
+ <delete id="deleteProjectAnnouncementFile">
+    delete from   t_project_announcement_file 
+     where announcement_id = #{id}
+       
+</delete>
+  <!-- 查询单条 -->
+  <select id="selectProjectAnnouncement" resultMap="nowResultMap">
+    select
+    <include refid="Column_List">
+		<property name="alias" value="a" />
+	</include>
+	m.name as orgName,n.name as createUserName
+	from t_project_announcement a
+	left join t_sys_organization m on a.org_id = m.id
+	left join t_sys_user n on a.create_user = n.id
+	where a.is_del = 0
+	and a.id =#{id}
+    
+
+    </select>
+      <!-- 查询单条文件 -->
+  <select id="selectProjectAnnouncementFile" resultMap="BaseFileResultMap">
+    select
+    <include refid="Base_File_Column_List">
+		
+	</include>
+	
+	from t_project_announcement_file 
+	where is_del = 0
+	and
+     announcement_id = #{id}
+    
+    
+
+    </select>
+     <!-- 物理删除主信息  -->
+     <update id="deletesProjectAnnouncement" parameterType="com.xingyun.equipment.admin.core.dto.RequestDTO" >
+		update t_project_announcement
+		set
+		is_del = 1
+		where id IN
+		<foreach item="ids" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{ids}
+		</foreach>
+	</update>
+	     <!-- 物理删除文件  -->
+     <update id="deletesProjectAnnouncementFile" parameterType="com.xingyun.equipment.admin.core.dto.RequestDTO" >
+		update t_project_announcement_file
+		set
+		is_del = 1
+		where id IN
+		<foreach item="ids" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{ids}
+		</foreach>
+	</update>
+    <select id="selectMaxCode"  resultType="java.lang.String" statementType="STATEMENT">
+         SELECT RIGHT(MAX(code),4) 
+       	FROM  t_project_announcement
+       	<where>
+       	 <if test="code != null and code != ''">
+        LEFT(code,8) = ${code} 
+       </if>
+       	</where>
+    
+    </select>
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.projectmanagement.dao.ProjectAreaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.projectmanagement.model.ProjectArea">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="parent_id" property="parentId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, name, parent_id AS parentId
+    </sql>
+
+    <select id="selectArea" parameterType="java.util.Map" resultType="com.xingyun.equipment.crane.modular.projectmanagement.vo.ProjectAreaVo">
+        SELECT
+        id,code,name,parent_id AS parentId
+        FROM
+        t_project_area
+        <if test="parentId != null">
+            WHERE parent_id = #{parentId}
+        </if>
+    </select>
+    
+    <select id="selectAreaInfo" parameterType="java.util.Map" resultType="com.xingyun.equipment.crane.modular.projectmanagement.vo.ProjectAreaVoVo">
+        SELECT
+        code AS id,name,parent_id AS parentId,id AS text
+        FROM
+        t_project_area
+    </select>
+</mapper>

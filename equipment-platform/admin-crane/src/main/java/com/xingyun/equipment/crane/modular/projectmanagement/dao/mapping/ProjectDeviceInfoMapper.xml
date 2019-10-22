@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.projectmanagement.dao.ProjectDeviceInfoMapper">
+
+    <select id="getDeviceInfo" resultType="com.xingyun.equipment.crane.modular.projectmanagement.vo.ProjectDeviceInfoVO">
+        select
+            p.id,
+            p.device_no as deviceNo,
+            "电表" as `name`,
+            (case p.is_online
+                when 1 then '在线'
+                else '离线' end)  as state,
+            i.name as projectName,
+            (case p.type
+        when 1 then '生活用电'
+        else '生产用电' end)    as type
+         from t_project_electric_power  p
+         left join t_project_info  i  on  p.project_id = i.id  and  i.is_del=0
+         where p.is_del=0   and  i.uuid=#{uuid}
+    </select>
+
+
+    <select id="getDeviceWaterInfo" resultType="com.xingyun.equipment.crane.modular.projectmanagement.vo.ProjectDeviceInfoVO">
+        select
+            p.id,
+            p.device_no as deviceNo,
+            "水表" as `name`,
+            (case p.is_online
+                when 1 then '在线'
+                else '离线' end)  as state,
+            i.name as projectName,
+            (case p.type
+        when 1 then '生活用水'
+        when 2 then '生产用水'
+        else '消防用水' end)    as type
+         from t_project_water_meter  p
+         left join t_project_info  i  on  p.project_id = i.id  and  i.is_del=0
+         where p.is_del=0   and  i.uuid=#{uuid}
+    </select>
+
+    <select id="getInfoDose" resultType="com.xingyun.equipment.crane.modular.projectmanagement.vo.ProjectDeviceDoseVO">
+
+        SELECT
+            #{deviceNo}  as deviceNo,
+           `actual_degree` as  degree,
+            date_format(create_time,'%Y-%m-%d %H:%i:%s') as deviceTime,
+           (`actual_degree` - (select degree from t_project_ammeter_daily where t_project_ammeter_daily.device_id = t_project_electric_power_detail_${yearMonth}.electric_id and statistics_date = '${frontQueryTime}' limit 1 ) )as used
+        FROM
+            `t_project_electric_power_detail_${yearMonth}`
+        WHERE
+            electric_id = (select id from t_project_electric_power where device_no =  #{deviceNo} )
+            and date_format(create_time,'%Y-%m-%d %H:%i:%s') like '${queryTime}%'
+        ORDER BY
+            create_time DESC
+        LIMIT 1
+    </select>
+
+
+    <select id="getInfoWaterDose" resultType="com.xingyun.equipment.crane.modular.projectmanagement.vo.ProjectDeviceDoseVO">
+
+        SELECT
+            #{deviceNo}  as deviceNo,
+           `actual_degree` as  degree,
+            date_format(create_time,'%Y-%m-%d %H:%i:%s') as deviceTime,
+            (`actual_degree` - (select degree from t_project_water_daily where t_project_water_daily.device_id = t_project_water_meter_detail_${yearMonth}.electric_id and statistics_date = '${frontQueryTime}' limit 1 ) )as used
+        FROM
+            `t_project_water_meter_detail_${yearMonth}`
+        WHERE
+            electric_id = (select id from t_project_water_meter where device_no =  #{deviceNo} )
+            and date_format(create_time,'%Y-%m-%d %H:%i:%s') like '${queryTime}%'
+        ORDER BY
+            create_time DESC
+        LIMIT 1
+    </select>
+
+</mapper>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectEnvironmentMessageMapper">
+    <insert id="insert">
+        insert into t_project_environment_message(
+          model,title,content,related_user,send_time
+        )values(
+          #{model},#{title},#{content},#{relatedUser},#{sendTime}
+        )
+    </insert>
+
+</mapper>

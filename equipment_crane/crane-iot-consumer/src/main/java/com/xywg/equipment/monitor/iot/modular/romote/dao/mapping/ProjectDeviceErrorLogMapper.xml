@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.romote.dao.ProjectDeviceErrorLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <!--<resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.romote.model.ProjectDeviceErrorLog">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+    </resultMap>-->
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+
+    </sql>
+
+    <insert id="insert">
+        insert into  t_project_device_error_log(
+          device_no,
+          content,
+          type,
+          project_id,
+          error_time,
+          is_del,
+          create_time,
+          create_user
+        )values(
+          #{deviceNo},
+          #{content},
+          #{type},
+          #{projectId},
+          #{errorTime},
+          0,
+          now(),
+          #{createUser}
+        )
+    </insert>
+
+
+    <sql id="fields">
+        device_no,content,type,project_id,error_time,is_del,create_time,create_user
+    </sql>
+
+</mapper>

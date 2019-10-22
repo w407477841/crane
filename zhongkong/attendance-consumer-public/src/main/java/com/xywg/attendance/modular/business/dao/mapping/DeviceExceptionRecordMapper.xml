@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.attendance.modular.business.dao.DeviceExceptionRecordMapper">
+
+    <insert id="insertSqlServer">
+        insert into buss_device_exception_record(
+            device_sn,
+            id_card_type,
+            id_card_number,
+            time,
+            exception_type,
+            is_del,
+            at_Type,
+            photo,
+            create_date
+        )values(
+            #{deviceSn},
+            #{ idCardType},
+            #{ idCardNumber},
+            #{time},
+            #{exceptionType},
+            #{isDel},
+            #{atType},
+            #{photo},
+            #{createDate}
+        )
+
+    </insert>
+
+
+</mapper>

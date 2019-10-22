@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingyun.equipment.crane.modular.device.dao.ProjectHelmetHeartbeatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xingyun.equipment.crane.modular.device.model.ProjectHelmetHeartbeat">
+        <id column="id" property="id" />
+        <result column="helmet_id" property="helmetId" />
+        <result column="imei" property="imei" />
+        <result column="status" property="status" />
+        <result column="end_time" property="endTime" />
+    	<result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        helmet_id,
+        imei,
+        status,
+        end_time,
+        create_time
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List_With_Alias">
+        ${alias}.id AS ${alias}_id,
+        ${alias}.helmet_id AS ${alias}_helmet_id,
+        ${alias}.imei AS ${alias}_imei,
+        ${alias}.status AS ${alias}_status,
+        ${alias}.end_time AS ${alias}_end_time,
+        ${alias}.create_time AS ${alias}_create_time,
+    </sql>
+
+    <!-- 通用查询结果列(带别名)-->
+    <sql id="Column_List">
+        ${alias}.id,
+        ${alias}.helmet_id,
+        ${alias}.imei,
+        ${alias}.status,
+        ${alias}.end_time,
+        ${alias}.create_time,
+    </sql>
+
+    <select id="selectMonitorStatus" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        t_project_helmet_heartbeat
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        ORDER BY create_time DESC
+    </select>
+</mapper>

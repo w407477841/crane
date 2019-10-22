@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.romote.dao.ProjectMessageDeviceErrorMapper">
+    <insert id="insert">
+          insert into  t_project_message_device_error(
+            user_ids,content,project_id,device_no,send_time,is_del,create_time
+          )values (
+            #{userIds},#{content},#{projectId},#{deviceNo},now(),0,now()
+          )
+    </insert>
+
+</mapper>

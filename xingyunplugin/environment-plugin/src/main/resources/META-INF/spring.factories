@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.xingyun.equipment.plugins.environmentplugin.AutoConfigEnvironmentPlugin
+
+

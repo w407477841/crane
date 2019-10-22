@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xywg.equipment.monitor.iot.modular.romote.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xywg.equipment.monitor.iot.modular.romote.model.User">
+        <id column="id" property="id" />
+        <result column="org_id" property="orgId" />
+        <result column="code" property="code" />
+        <result column="phone" property="phone" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="flag" property="flag" />
+        <result column="relation_user_id" property="relationUserId" />
+        <result column="status" property="status" />
+        <result column="comments" property="comments" />
+        <result column="is_del" property="isDel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_user" property="createUser" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_user" property="modifyUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, org_id AS orgId, code, phone, name, password, flag, relation_user_id AS relationUserId, status, comments, is_del AS isDel, create_time AS createTime, create_user AS createUser, modify_time AS modifyTime, modify_user AS modifyUser
+    </sql>
+
+
+
+    <select id="getListUserByIds" resultType="com.xywg.equipment.monitor.iot.modular.romote.model.User">
+        select <include refid="Base_Column_List"/>
+        from t_sys_user where is_del=0
+        and id in(
+        <foreach collection="ids" index="index" item="item" close="" open="" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+</mapper>
